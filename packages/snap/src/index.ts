@@ -1,158 +1,185 @@
 import { OnTransactionHandler } from '@metamask/snaps-types';
 import { panel, heading, text } from '@metamask/snaps-ui';
-import { hasProperty, isObject, Json } from '@metamask/utils';
+
+type AddressTag = {
+  key0: string; // caip-10 address
+  key1: string; // public name
+  key2: string; // project name (optional, none is empty string)
+  key3: string; // link to interface / info
+};
+
+type ContractDomain = {
+  key0: string; // caip-10 address
+  key1: string; // domain
+};
+
+type Token = {
+  key0: string; // caip-10 address
+  key1: string; // token name
+  key2: string; // symbol
+  // this below will have length 1, and contain an IPFS link to an image.
+  props: {
+    value: string;
+  }[];
+  // info on decimals could be fetched as well, but we deliberately don't get it.
+};
+
+type Insight = {
+  value: string;
+};
+
+type GraphQLResponse = {
+  data: {
+    addressTags: AddressTag[];
+    contractDomains: ContractDomain[];
+    tokens: Token[];
+  };
+};
+
+// For parsing out the domain
+const getDomainFromUrl = (url: string): string | null => {
+  const match = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/iu);
+  if (match) {
+    return match[1];
+  }
+  return null;
+};
+
+const fetchGraphQLData = async (variables: {
+  targetAddress: string;
+  domain: string;
+}): Promise<GraphQLResponse> => {
+  // Comments may be added on GraphQL queries with `#`. They were purposedly
+  // not added here to save data. All 3 queries below have a hardcoded
+  // registry, as only one Curate TCR contract is used for each data type,
+  // for contracts on all chains.
+
+  // There are three queries:
+  // 1. addressTags is a general purpose registry of contract tags.
+  // Contracts cannot be dupe, so we only fetch the first match.
+  // 2. contractDomains links contract addresses and domains (for safety, phishing prevention...)
+  // We are only interested on whether one exists, so we fetch first match.
+  // 3. tokens contains names, symbols, decimals, etc, and a link to a logo.
+  // Tokens cannot be dupe on address, so fetch first match.
+  const query = `
+  query($targetAddress: String!, $domain: String!) {
+    addressTags: litems(where:{
+      registry:"0x66260c69d03837016d88c9877e61e08ef74c59f2",
+      key0_contains_nocase: $targetAddress,
+      status_in:[Registered, ClearingRequested]
+    }, first: 1) {
+      itemID
+      key0
+      key1
+      key2
+      key3
+      key4
+    }
+    contractDomains: litems(where:{
+      registry:"0x957a53a994860be4750810131d9c876b2f52d6e1",
+      key0_contains_nocase: $targetAddress,
+      key1: $domain,
+      status_in:[Registered, ClearingRequested]
+    }, first: 1) {
+      itemID
+      key0
+      key1
+    }
+    tokens: litems(where:{
+      registry:"0x70533554fe5c17caf77fe530f77eab933b92af60",
+      key0_contains_nocase: $targetAddress,
+      status_in:[Registered, ClearingRequested]
+    }, first: 1) {
+      itemID
+      key0
+      key1
+      key2
+      props(where: {label: "Logo"}) {
+        value
+      }
+    }
+  }
+  `;
+  const response = await fetch(
+    'https://api.thegraph.com/subgraphs/name/greenlucid/legacy-curate-xdai',
+    {
+      method: 'POST',
+      headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        variables,
+      }),
+    },
+  );
+
+  const result = await response.json();
+  return result;
+};
+
+const getInsights = async (
+  caipAddress: string,
+  domain: string,
+): Promise<Insight[]> => {
+  const result = await fetchGraphQLData({
+    domain,
+    targetAddress: caipAddress,
+  });
+  const projectNameLabel = result.data.addressTags[0]
+    ? result.data.addressTags[0].key2 ?? 'LABEL_WHEN_TAGGED_BUT_NO_PROJECT'
+    : '_Not found_';
+
+  const contractTag = result.data.addressTags[0]
+    ? result.data.addressTags[0].key1 // Don't handle "" because the registry _MUST NOT_ accept it.
+    : '_Not found_';
+
+  const verifiedDomain = result.data.contractDomains.length > 0;
+  const insights: Insight[] = [
+    {
+      // TODO on LABEL_WHEN_TAGGED_BUT_NO_PROJECT, it could make sense to format differently.
+      value: `**Project Name:** ${projectNameLabel}`,
+    },
+    {
+      value: `**Contract Tag:** ${contractTag}`,
+    },
+    {
+      value: verifiedDomain
+        ? '**Domain**: Contract **verified** for this domain'
+        : '**Domain**: Contract does **not** recognize this domain',
+    },
+  ];
+
+  // Only adding this insight if token.
+  // (Green) Can we put the logo info to use?
+
+  // (GM) Maybe we can improve it to distinguish between token and non-token contracts
+  // (function signatures maybe?)
+  if (result.data.tokens.length > 0) {
+    const tokenData = result.data.tokens[0];
+    insights.push({
+      // etherscan-like token syntax
+      value: `**Token:** ${tokenData.key1} (${tokenData.key2})`,
+    });
+  }
+
+  return insights;
+};
 
 export const onTransaction: OnTransactionHandler = async ({
   transactionOrigin,
   transaction,
   chainId,
 }) => {
-  interface litem {
-    key0: string;
-    key1: string;
-    key2: string;
-  }
-
-  interface GraphQLResponse {
-    data: {
-      litems: litem[];
-    };
-  }
-
-  interface Insight {
-    value: string;
-  }
-
-  // For parsing out the domain
-  function getDomainFromUrl(url: string): string | null {
-    const match = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
-    if (match) {
-      return match[1];
-    }
-    return null;
-  }
-
+  const domain =
+    getDomainFromUrl(transactionOrigin ?? 'NO_DOMAIN') ?? 'NO_DOMAIN';
+  const hexChainId = Number(chainId).toString(16);
+  const caipAddress = `eip155:${hexChainId}:${transaction.to as string}`;
   console.log(JSON.stringify(transaction));
 
-  //All 3 queries below have a hardcoded registry, as only one contract is used for each data type for contracts on all chains.
-  //1. For querying Address Tags
-  const query1 = ` 
-    query {
-      litems(where:{registry:"0xa64e8949ad24259526a32d4bfd53a9f2154ae6bb", key0_contains_nocase: "${chainId}:${
-    transaction.to as string
-  }" , status_in:[Registered], disputed:false})
-    {
-        itemID
-        key0
-        key1
-        key2
-        key3
-        key4
-      }
-    }
-    `;
-  const domain = getDomainFromUrl(
-    transactionOrigin ? transactionOrigin : 'NO_DOMAIN',
-  );
-
-  //2. For querying Contract Domain Name entries
-  const query2 = `
-    query {
-      litems(where:{registry:"0x957a53a994860be4750810131d9c876b2f52d6e1", key0_contains_nocase: "${chainId}:${
-    transaction.to as string
-  }" , key1: "${domain}", status_in:[Registered], disputed:false})
-    {
-        itemID
-        key0
-        key1
-        key2
-
-      }
-    }
-  `;
-
-  //3. For querying if the contract is a Token contract
-  const query3 = `
-    query {
-      litems(where:{registry:"0x3d0ab3323fe71954e81897f29bd257e47b12b923", key0_contains_nocase: "${chainId}:${
-    transaction.to as string
-  }" , key1: "${domain}", status_in:[Registered], disputed:false})
-    {
-        itemID
-        key0
-        key1
-        key2
-
-      }
-    }
-  `;
-
-  async function fetchGraphQLData(query: string): Promise<GraphQLResponse> {
-    const response = await fetch(
-      'https://api.thegraph.com/subgraphs/name/greenlucid/legacy-curate-xdai',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          query,
-        }),
-      },
-    );
-
-    const result = await response.json();
-    return result;
-  }
-
-  async function getInsights(transaction: {
-    [key: string]: Json;
-  }): Promise<Insight[]> {
-    const graphQLData1 = await fetchGraphQLData(query1);
-    const litems1 = graphQLData1.data.litems;
-
-    const graphQLData2 = await fetchGraphQLData(query2);
-    const litems2 = graphQLData2.data.litems;
-
-    const graphQLData3 = await fetchGraphQLData(query3);
-    const litems3 = graphQLData3.data.litems;
-
-    const insights: Insight[] = [
-      //retrieving on the first address tag, assuming that the TCR ensures there will not be more than one valid tag per contract
-      {
-        value:
-          '**Project Name:** ' +
-          (litems1.length > 0 ? litems1[0].key1 : '_Not found_'),
-      },
-      {
-        value:
-          '**Contract Tag:** ' +
-          (litems1.length > 0
-            ? litems1[0].key2 +
-              (litems1[0].key3 ? '(' + litems1[0].key3 + ')' : '')
-            : '_Not found_'),
-      },
-      {
-        value:
-          '**Contract verified for this domain:** ' +
-          (litems2.length > 0 ? 'Yes (' + domain + ')' : 'No'),
-      },
-    ];
-
-    //As the minority of contracts are not tokens, only adding this entry if the query3 has a positive result from the tokens registry.
-    //Right now, it doesn't show this line at all if a token is not verified. Maybe we can improve it to distinguish between token and non-token contracts (function signatures maybe?)
-    if (litems3.length > 0) {
-      insights.push({
-        value:
-          '**Token contract details:** ' + litems3[0] + ' (' + litems3[2] + ')',
-      });
-    }
-
-    return insights;
-  }
-
-  const insights = await getInsights(transaction);
+  const insights = await getInsights(caipAddress, domain);
 
   return {
     content: panel([
