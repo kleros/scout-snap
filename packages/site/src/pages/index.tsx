@@ -99,7 +99,7 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.post(
-        'https://api.thegraph.com/subgraphs/name/greenlucid/legacy-curate-xdai',
+        'https://api.thegraph.com/subgraphs/name/kleros/legacy-curate-xdai',
         {
           query: `
           {
