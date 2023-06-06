@@ -101,7 +101,7 @@ const fetchGraphQLData = async (variables: {
   }
   `;
   const response = await fetch(
-    'https://api.thegraph.com/subgraphs/name/greenlucid/legacy-curate-xdai',
+    'https://api.thegraph.com/subgraphs/name/kleros/legacy-curate-xdai',
     {
       method: 'POST',
       headers: {
