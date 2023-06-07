@@ -6,5 +6,6 @@ This Snap pulls contract metadata from Kleros's decentralized token curated regi
 
 - This is an beta version of this Snap and is still going through constant iteration.
 - The data used in this Snap is pulled from the following decentralized registries on Kleros Curate:
-    - [Contract-Domain Name Registry](https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1)
-    - [Address Tags Registry](https://curate.kleros.io/tcr/100/0x76944a2678A0954A610096Ee78E8CEB8d46d5922)
+  - [Contract-Domain Name Registry](https://curate.kleros.io/tcr/100/0x957a53a994860be4750810131d9c876b2f52d6e1)
+  - [Address Tags Registry](https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2)
+  - [Tokens Registry](https://curate.kleros.io/tcr/100/0x70533554fe5c17caf77fe530f77eab933b92af60)
