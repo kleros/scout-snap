@@ -129,7 +129,7 @@ const getInsights = async (
     targetAddress: caipAddress,
   });
   const projectNameLabel = result.data.addressTags[0]
-    ? result.data.addressTags[0].key2 ?? 'LABEL_WHEN_TAGGED_BUT_NO_PROJECT'
+    ? result.data.addressTags[0].key2 ?? '_N.A._'
     : '_Not found_';
 
   const contractTag = result.data.addressTags[0]
@@ -139,7 +139,6 @@ const getInsights = async (
   const verifiedDomain = result.data.contractDomains.length > 0;
   const insights: Insight[] = [
     {
-      // TODO on LABEL_WHEN_TAGGED_BUT_NO_PROJECT, it could make sense to format differently.
       value: `**Project Name:** ${projectNameLabel}`,
     },
     {
@@ -148,7 +147,7 @@ const getInsights = async (
     {
       value: verifiedDomain
         ? '**Domain**: Contract **verified** for this domain'
-        : '**Domain**: Contract does **not** recognize this domain',
+        : '**Domain**: Contract **not** recognized for this domain',
     },
   ];
 
@@ -175,8 +174,8 @@ export const onTransaction: OnTransactionHandler = async ({
 }) => {
   const domain =
     getDomainFromUrl(transactionOrigin ?? 'NO_DOMAIN') ?? 'NO_DOMAIN';
-  const hexChainId = Number(chainId).toString(16);
-  const caipAddress = `eip155:${hexChainId}:${transaction.to as string}`;
+  const numericChainId = parseInt(chainId.split(':')[1], 16);
+  const caipAddress = `eip155:${numericChainId}:${transaction.to as string}`;
   console.log(JSON.stringify(transaction));
 
   const insights = await getInsights(caipAddress, domain);
