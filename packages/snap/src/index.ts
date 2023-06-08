@@ -1,39 +1,30 @@
 import { OnTransactionHandler } from '@metamask/snaps-types';
 import { panel, heading, text } from '@metamask/snaps-ui';
+import mdEscape from 'markdown-escape';
 
 type AddressTag = {
-  key0: string; // caip-10 address
-  key1: string; // public name
-  key2: string; // project name (optional, none is empty string)
-  key3: string; // link to interface / info
+  caipAddress: string;
+  publicName: string;
+  projectName: string;
+  infoLink: string;
 };
 
 type ContractDomain = {
-  key0: string; // caip-10 address
-  key1: string; // domain
+  caipAddress: string;
+  domain: string;
 };
 
 type Token = {
-  key0: string; // caip-10 address
-  key1: string; // token name
-  key2: string; // symbol
-  // this below will have length 1, and contain an IPFS link to an image.
-  props: {
-    value: string;
-  }[];
+  caipAddress: string;
+  name: string;
+  symbol: string;
   // info on decimals could be fetched as well, but we deliberately don't get it.
 };
 
-type Insight = {
-  value: string;
-};
-
-type GraphQLResponse = {
-  data: {
-    addressTags: AddressTag[];
-    contractDomains: ContractDomain[];
-    tokens: Token[];
-  };
+type CuratedInfo = {
+  addressTag?: AddressTag;
+  contractDomain?: ContractDomain;
+  token?: Token;
 };
 
 // For parsing out the domain
@@ -48,7 +39,7 @@ const getDomainFromUrl = (url: string): string | null => {
 const fetchGraphQLData = async (variables: {
   targetAddress: string;
   domain: string;
-}): Promise<GraphQLResponse> => {
+}): Promise<CuratedInfo> => {
   // Comments may be added on GraphQL queries with `#`. They were purposedly
   // not added here to save data. All 3 queries below have a hardcoded
   // registry, as only one Curate TCR contract is used for each data type,
@@ -94,9 +85,6 @@ const fetchGraphQLData = async (variables: {
       key0
       key1
       key2
-      props(where: {label: "Logo"}) {
-        value
-      }
     }
   }
   `;
@@ -117,51 +105,99 @@ const fetchGraphQLData = async (variables: {
   );
 
   const result = await response.json();
-  return result;
+
+  // Kleros Curate is a generalized registry, and is indexed by a generalized subgraph.
+  // Indexed fields are written into fields such as key0, key1...
+  // To make this code more readable, they are parsed onto the types at the beginning of this file.
+
+  const parsedAddressTag: AddressTag | undefined = result.data.addressTags[0]
+    ? {
+        caipAddress: mdEscape(result.data.addressTags[0].key0),
+        publicName: mdEscape(result.data.addressTags[0].key1),
+        projectName: mdEscape(result.data.addressTags[0].key2),
+        infoLink: mdEscape(result.data.addressTags[0].key3),
+      }
+    : undefined;
+
+  const parsedContractDomain: ContractDomain | undefined = result.data
+    .contractDomains[0]
+    ? {
+        caipAddress: mdEscape(result.data.contractDomains[0].key0),
+        domain: mdEscape(result.data.contractDomains[0].key1),
+      }
+    : undefined;
+
+  const parsedToken: Token | undefined = result.data.tokens[0]
+    ? {
+        caipAddress: mdEscape(result.data.tokens[0].key0),
+        name: mdEscape(result.data.tokens[0].key1),
+        symbol: mdEscape(result.data.tokens[0].key2),
+      }
+    : undefined;
+
+  const curatedInfo: CuratedInfo = {
+    addressTag: parsedAddressTag,
+    contractDomain: parsedContractDomain,
+    token: parsedToken,
+  };
+  return curatedInfo;
 };
+
+/**
+ * Fetch and parse TCR data from the subgraph, generates human readable insights.
+ *
+ * @param caipAddress - https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md
+ * @param domain - Domain that launched the contract interaction
+ * @param contractAddress - Hex address of the contract
+ * @returns List of resolved insights to display to the user
+ */
 
 const getInsights = async (
   caipAddress: string,
   domain: string,
-): Promise<Insight[]> => {
+  contractAddress: string,
+): Promise<string[]> => {
   const result = await fetchGraphQLData({
     domain,
     targetAddress: caipAddress,
   });
-  const projectNameLabel = result.data.addressTags[0]
-    ? result.data.addressTags[0].key2 ?? '_N.A._'
-    : '_Not found_';
+  const insights: string[] = [];
+  if (result.addressTag) {
+    // key2 is projectName, which is optional. No project name === "", which is falsy.
+    const projectNameLabel = result.addressTag.projectName
+      ? // Markdown link. If there is a project name, we TRUST the registry to pass a link.
+        `[${result.addressTag.projectName}](${result.addressTag.infoLink})`
+      : '_N.A._';
+    // Don't handle "" because the registry _MUST NOT_ accept it. The registry is TRUSTED.
+    // Contract tag is a mandatory field.
+    const contractTag = result.addressTag.publicName;
+    insights.push(`**Project:** ${projectNameLabel}`);
+    insights.push(`**Contract Tag:** ${contractTag}`);
+  } else {
+    // Contract was not tagged in Address Tags. Let the user know, and provide a link to tag it.
+    const addressNotFound = `Contract Tag: _Not Found_ ([Tag me]\
+(https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2\
+?action=submit&Public%20Name%20Tag=&Contract%20Address=${contractAddress}))`;
+    insights.push(addressNotFound);
+  }
 
-  const contractTag = result.data.addressTags[0]
-    ? result.data.addressTags[0].key1 // Don't handle "" because the registry _MUST NOT_ accept it.
-    : '_Not found_';
+  const domainLabel = result.contractDomain
+    ? `**Domain:** Domain **verified** for this contract`
+    : `**Domain:** This contract does **NOT recognize** this domain. (Is this wrong? [Tag it here]\
+(https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1\
+?action=submit&Contract%20Address=${caipAddress}&Domain%20Name=${domain}))`;
+  insights.push(domainLabel);
 
-  const verifiedDomain = result.data.contractDomains.length > 0;
-  const insights: Insight[] = [
-    {
-      value: `**Project Name:** ${projectNameLabel}`,
-    },
-    {
-      value: `**Contract Tag:** ${contractTag}`,
-    },
-    {
-      value: verifiedDomain
-        ? '**Domain**: Contract **verified** for this domain'
-        : '**Domain**: Contract **not** recognized for this domain',
-    },
-  ];
-
-  // Only adding this insight if token.
-  // (Green) Can we put the logo info to use?
-
-  // (GM) Maybe we can improve it to distinguish between token and non-token contracts
-  // (function signatures maybe?)
-  if (result.data.tokens.length > 0) {
-    const tokenData = result.data.tokens[0];
-    insights.push({
+  if (result.token) {
+    insights.push(
       // etherscan-like token syntax
-      value: `**Token:** ${tokenData.key1} (${tokenData.key2})`,
-    });
+      `**Token:** ${result.token.name} (${result.token.symbol})`,
+    );
+  } else {
+    const notTokenLabel = `Is this a token? [Tag it here]\
+    (https://curate.kleros.io/tcr/100/0x70533554fe5c17caf77fe530f77eab933b92af60\
+    ?action=submit&Address=${caipAddress})`;
+    insights.push(notTokenLabel);
   }
 
   return insights;
@@ -178,12 +214,16 @@ export const onTransaction: OnTransactionHandler = async ({
   const caipAddress = `eip155:${numericChainId}:${transaction.to as string}`;
   console.log(JSON.stringify(transaction));
 
-  const insights = await getInsights(caipAddress, domain);
+  const insights = await getInsights(
+    caipAddress,
+    domain,
+    transaction.to as string,
+  );
 
   return {
     content: panel([
       heading('Contract insights from Kleros'),
-      ...insights.map((insight) => text(insight.value)),
+      ...insights.map((insight) => text(insight)),
     ]),
   };
 };
