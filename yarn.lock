@@ -11705,7 +11705,6 @@ __metadata:
     eslint-plugin-jsdoc: ^39.9.1
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^4.2.1
-    markdown-escape: ^2.0.0
     prettier: ^2.8.8
     prettier-plugin-packagejson: ^2.4.3
     rimraf: ^3.0.2
