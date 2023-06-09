@@ -1,14 +1,11 @@
 // index.ts
+import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { MetamaskActions, MetaMaskContext } from '../hooks';
-import {
-  connectSnap,
-  getSnaps
-} from '../utils';
+
 import { InstallButton } from '../components';
-import axios from 'axios';
-//import { defaultSnapOrigin } from '../config';
+import { MetamaskActions, MetaMaskContext } from '../hooks';
+import { connectSnap, getSnaps } from '../utils';
 
 const Body = styled.div`
   background-color: #F8F9FA;
@@ -42,7 +39,6 @@ const Span = styled.span`
   color: ${(props) => props.theme.colors.primary.default};
 `;
 
-
 const SearchInput = styled.input`
   font-size: 2rem;
   width: 50%;
@@ -55,9 +51,9 @@ const SearchInput = styled.input`
 `;
 
 const Subtext = styled.p`
-font-size: 1rem;
-color: #888;
-`
+  font-size: 1rem;
+  color: #888;
+`;
 
 const SearchResultList = styled.ul`
   list-style-type: none;
@@ -87,7 +83,6 @@ const SearchBarContainer = styled.div`
   width: 80%;
   height: 5rem;
 `;
-
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -155,9 +150,9 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
     }
   };
 
@@ -170,10 +165,11 @@ const Index = () => {
         <SearchBarContainer>
           <SearchInput
             type="text"
-            placeholder="kleros-contracts-insights-snap"
+            placeholder="@kleros/scout-snap"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          /><InstallButton
+            onChange={(error) => setSearch(error.target.value)}
+          />
+          <InstallButton
             onClick={handleConnectClick}
             snapsNpmName={selectedPackage}
             disabled={!selectedPackage}
@@ -200,7 +196,5 @@ const Index = () => {
     </Body>
   );
 };
-
-
 
 export default Index;

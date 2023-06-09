@@ -1,4 +1,4 @@
-# Kleros's Contract Insights Snap
+# Kleros Scout Snap
 
 This Snap pulls contract metadata from Kleros's decentralized token curated registries to provide insights to the contract you are interacting with.
 

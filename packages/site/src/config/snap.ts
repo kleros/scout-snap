@@ -3,4 +3,4 @@
  * Will default to the local hosted snap if no value is provided in environment.
  */
 export const defaultSnapOrigin =
-  process.env.SNAP_ORIGIN ?? `npm:kleros-contracts-insights-snap`;
+  process.env.SNAP_ORIGIN ?? 'npm:@kleros/scout-snap';

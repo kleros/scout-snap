@@ -223,7 +223,7 @@ export const onTransaction: OnTransactionHandler = async ({
 
   return {
     content: panel([
-      heading('Contract insights from Kleros'),
+      heading('Contract insights'),
       ...insights.map((insight) => text(insight)),
     ]),
   };
