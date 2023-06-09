@@ -187,8 +187,8 @@ https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2\
   }
 
   const domainLabel = result.contractDomain
-    ? `**Domain:** (_${domain}_) is **verified** for this contract`
-    : `**Domain:** (_${domain}_) is **NOT verified** for this contract. (Is this wrong? Tag it here): \
+    ? `**Domain:** _${domain}_ is **verified** for this contract`
+    : `**Domain:** _${domain}_ is **NOT verified** for this contract. (Is this wrong? Tag it here): \
 https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1\
 ?action=submit&Contract%20Address=${caipAddress}&Domain%20Name=${domain}`;
   insights.push(domainLabel);
