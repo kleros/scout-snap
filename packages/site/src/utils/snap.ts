@@ -44,8 +44,8 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
       (snap) =>
         snap.id === defaultSnapOrigin && (!version || snap.version === version),
     );
-  } catch (e) {
-    console.log('Failed to obtain installed snap', e);
+  } catch (error) {
+    console.log('Failed to obtain installed snap', error);
     return undefined;
   }
 };
@@ -61,9 +61,9 @@ export const sendHello = async () => {
   });
 };
 
-export const isLocalSnap = (snapId?: string) => {
-  if (snapId == null) {
+export const isLocalSnap = (snapId?: string): boolean | undefined => {
+  if (snapId === null) {
     return false;
   }
-  return snapId.startsWith('local:');
+  return snapId?.startsWith('local:');
 };
