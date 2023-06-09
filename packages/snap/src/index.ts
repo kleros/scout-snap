@@ -149,13 +149,14 @@ const fetchGraphQLData = async (variables: {
  *
  * @param caipAddress - https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md
  * @param domain - Domain that launched the contract interaction
- * @param contractAddress - Hex address of the contract
+ * @param contractAddress - Hex address of the contract. todo: to be used when links are available.
  * @returns List of resolved insights to display to the user
  */
 
 const getInsights = async (
   caipAddress: string,
   domain: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   contractAddress: string,
 ): Promise<string[]> => {
   const result = await fetchGraphQLData({
@@ -177,20 +178,19 @@ const getInsights = async (
     insights.push(`**Contract Tag:** ${contractTag}`);
   } else {
     // Contract was not tagged in Address Tags. Let the user know, and provide a link to tag it.
-    // Note: current @metamask/snaps-ui does not allow markdown links.
-    // In order to have the links take part in the audit, they will be rendered as plaintext links.
-    // todo: when links are a feature, turn them into [Tag me](https://curate.kleros.io/...)
-    const addressNotFound = `**Contract Tag:** _Not Found_ (Tag me): \
-https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2\
-?action=submit&Public%20Name%20Tag=&Contract%20Address=${contractAddress}`;
+    // Note: current @metamask/snaps-ui does not allow markdown links, so no links in this version.
+    // todo: when links are a feature, turn them into [Tag me](https://curate.kleros.io/...), deeplink:
+    // https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2?action=submit&Public%20Name%20Tag=&Contract%20Address=${contractAddress}
+    const addressNotFound = `**Contract Tag:** _Not Found_`;
     insights.push(addressNotFound);
   }
 
   const domainLabel = result.contractDomain
     ? `**Domain:** _${domain}_ is **verified** for this contract`
-    : `**Domain:** _${domain}_ is **NOT verified** for this contract. (Is this wrong? Tag it here): \
-https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1\
-?action=submit&Contract%20Address=${caipAddress}&Domain%20Name=${domain}`;
+    : // todo: when links are a feature, deeplink:
+      // https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1?action=submit&Contract%20Address=${caipAddress}&Domain%20Name=${domain}
+      `**Domain:** _${domain}_ is **NOT verified** for this contract
+`;
   insights.push(domainLabel);
 
   // Token information is only shown if confirmed to be a token.
