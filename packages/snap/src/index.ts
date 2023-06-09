@@ -1,5 +1,6 @@
 import { OnTransactionHandler } from '@metamask/snaps-types';
 import { panel, heading, text } from '@metamask/snaps-ui';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
 
 type AddressTag = {
@@ -165,8 +166,9 @@ const getInsights = async (
   if (result.addressTag) {
     // key2 is projectName, which is optional. No project name === "", which is falsy.
     const projectNameLabel = result.addressTag.projectName
-      ? // Markdown link. If there is a project name, we TRUST the registry to pass a link.
-        `[${result.addressTag.projectName}](${result.addressTag.infoLink})`
+      ? // If there is a project name, we TRUST the registry to pass a link.
+        // todo: when links are a feature, use result.addressTag.infoLink and turn into markdown link
+        result.addressTag.projectName
       : '_N.A._';
     // Don't handle "" because the registry _MUST NOT_ accept it. The registry is TRUSTED.
     // Contract tag is a mandatory field.
@@ -175,29 +177,28 @@ const getInsights = async (
     insights.push(`**Contract Tag:** ${contractTag}`);
   } else {
     // Contract was not tagged in Address Tags. Let the user know, and provide a link to tag it.
-    const addressNotFound = `Contract Tag: _Not Found_ ([Tag me]\
-(https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2\
-?action=submit&Public%20Name%20Tag=&Contract%20Address=${contractAddress}))`;
+    // Note: current @metamask/snaps-ui does not allow markdown links.
+    // In order to have the links take part in the audit, they will be rendered as plaintext links.
+    // todo: when links are a feature, turn them into [Tag me](https://curate.kleros.io/...)
+    const addressNotFound = `**Contract Tag:** _Not Found_ (Tag me): \
+https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2\
+?action=submit&Public%20Name%20Tag=&Contract%20Address=${contractAddress}`;
     insights.push(addressNotFound);
   }
 
   const domainLabel = result.contractDomain
-    ? `**Domain:** Domain **verified** for this contract`
-    : `**Domain:** This contract does **NOT recognize** this domain. (Is this wrong? [Tag it here]\
-(https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1\
-?action=submit&Contract%20Address=${caipAddress}&Domain%20Name=${domain}))`;
+    ? `**Domain:** (_${domain}_) is **verified** for this contract`
+    : `**Domain:** (_${domain}_) is **NOT verified** for this contract. (Is this wrong? Tag it here): \
+https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1\
+?action=submit&Contract%20Address=${caipAddress}&Domain%20Name=${domain}`;
   insights.push(domainLabel);
 
+  // Token information is only shown if confirmed to be a token.
   if (result.token) {
     insights.push(
       // etherscan-like token syntax
       `**Token:** ${result.token.name} (${result.token.symbol})`,
     );
-  } else {
-    const notTokenLabel = `Is this a token? [Tag it here]\
-    (https://curate.kleros.io/tcr/100/0x70533554fe5c17caf77fe530f77eab933b92af60\
-    ?action=submit&Address=${caipAddress})`;
-    insights.push(notTokenLabel);
   }
 
   return insights;
