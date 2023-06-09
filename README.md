@@ -1,11 +1,11 @@
 <p align="center">
   <a href="https://contract-insight-snap.kleros.builders/">
-    <img alt="Kleros Contract Insights" src="docs/kleros-metamask-snap-logo.png" width="512">
+    <img alt="Kleros Scout Snap" src="docs/kleros-metamask-snap-logo.png" width="512">
   </a>
 </p>
 
 <p align="center">
-  <b style="font-size: 32px;">Kleros Contract Insights Snap</b>
+  <b style="font-size: 32px;">Kleros Scout Snap</b>
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@
 
 ---
 
-# Kleros Contract Insights Snap
+# Kleros Scout Snap
 
 ## Getting Started
 A Metamask Snap project that serves a page to allow you to connect your Metamask Flask and install the Kleros contract insights snap (that uses data from Kleros Curate).

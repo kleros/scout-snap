@@ -1,18 +1,18 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.2",
   "description": "A Snap that retrieves contract metadata from the Kleros Curate registries.",
-  "proposedName": "Kleros Curate metadata",
+  "proposedName": "Kleros Scout",
   "repository": {
     "type": "git",
     "url": "https://github.com/kleros/contract-insights-snap.git"
   },
   "source": {
-    "shasum": "gLd9TKCogZ83FLqQi9HZKuyf7VnPQs16Ot9fX4WLkNE=",
+    "shasum": "wZ6uKGPtEzRJWfiy8+NrwcynAblDv34d+7Q5/B8EIkg=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "kleros-contracts-insights-snap",
+        "packageName": "@kleros/scout-snap",
         "registry": "https://registry.npmjs.org/"
       }
     }

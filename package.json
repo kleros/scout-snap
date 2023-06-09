@@ -1,5 +1,5 @@
 {
-  "name": "kleros-contract-insights-snap",
+  "name": "@kleros/scout",
   "version": "0.1.4",
   "description": "",
   "homepage": "https://contract-insight-snap.kleros.builders/",
@@ -10,8 +10,12 @@
     "type": "git",
     "url": "git+https://github.com/kleros/contract-insights-snap.git"
   },
+  "author": {
+    "name": "Kleros",
+    "email": "contact@kleros.io",
+    "url": "https://kleros.io"
+  },
   "license": "(MIT-0 OR Apache-2.0)",
-  "author": "",
   "workspaces": [
     "packages/*"
   ],
@@ -58,7 +62,7 @@
     "yaml@npm:^2.0.0": "^2.3.1",
     "engine.io@npm:~6.2.1": "^6.4.2"
   },
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@3.3.1",
   "engines": {
     "node": ">=16.0.0"
   },

@@ -1,10 +1,15 @@
 {
-  "name": "kleros-contracts-insights-snap",
-  "version": "0.4.0",
-  "description": "The Kleros contracts insights Snap, built for Metamask!",
+  "name": "@kleros/scout-snap",
+  "version": "0.5.2",
+  "description": "A Metamask Snap that retrieves contract metadata from the Kleros Curate registries",
   "repository": {
     "type": "git",
     "url": "https://github.com/kleros/contract-insights-snap.git"
+  },
+  "author": {
+    "name": "Kleros",
+    "email": "contact@kleros.io",
+    "url": "https://kleros.io"
   },
   "license": "(MIT-0 OR Apache-2.0)",
   "main": "src/index.ts",
