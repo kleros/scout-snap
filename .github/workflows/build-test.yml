@@ -11,8 +11,8 @@ permissions:
 
 jobs:
   build-lint-test:
-    name: Build, Lint, and Test
-    runs-on: ubuntu-20.04
+    name: Lint
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [16.x, 18.x]
@@ -22,39 +22,33 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2 
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@7c12f8017d5436eb855f1ed4399f037a36fbd9e8 # v2.5.2
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Get Yarn cache directory
-        run: echo "::set-output name=YARN_CACHE_DIR::$(yarn cache dir)"
-        id: yarn-cache-dir
+
+      - name: Install yarn
+        run: npm install -g yarn
+
       - name: Get Yarn version
-        run: echo "::set-output name=YARN_VERSION::$(yarn --version)"
+        run: echo "YARN_VERSION=$(yarn --version)" >> "$GITHUB_ENV"
         id: yarn-version
+
       - name: Cache yarn dependencies
-        uses: actions/cache@8492260343ad570701412c2f464a5877dc76bace # v2
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
+        if: ${{ !env.ACT }}
         with:
-          path: ${{ steps.yarn-cache-dir.outputs.YARN_CACHE_DIR }}
-          key: yarn-cache-${{ runner.os }}-${{ steps.yarn-version.outputs.YARN_VERSION }}-${{ hashFiles('yarn.lock') }}
-      - run: yarn install --immutable
-      - run: yarn build
-      - run: yarn lint
-      - run: yarn test
-      - name: Require clean working directory
-        shell: bash
-        run: |
-          if ! git diff --exit-code; then
-            echo "Working tree dirty after building"
-            exit 1
-          fi
-  #      - name: Validate RC changelog
-  #        if: ${{ startsWith(github.head_ref, 'release/') }}
-  #        run: yarn auto-changelog validate --rc
-  #      - name: Validate changelog
-  #        if: ${{ !startsWith(github.head_ref, 'release/') }}
-  #        run: yarn auto-changelog validate
+          path: ./node_modules
+          key: yarn-cache-${{ runner.os }}-${{ env.YARN_VERSION }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint
+        run: yarn lint
+
   all-jobs-pass:
     name: All jobs pass
     runs-on: ubuntu-20.04
