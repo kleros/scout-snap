@@ -3898,6 +3898,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/markdown-escape@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@types/markdown-escape@npm:1.1.0"
+  checksum: 4d925d3475756e35f365429db4a2516ecaac6a35af87b396c0c5654cd69fc78409dbb4d4cd0cbaea8d7984a55d38714d6cf2ad7ccc18444e49d8071c4eae6b81
+  languageName: node
+  linkType: hard
+
 "@types/minimatch@npm:*, @types/minimatch@npm:^5.1.2":
   version: 5.1.2
   resolution: "@types/minimatch@npm:5.1.2"
@@ -11655,6 +11662,7 @@ __metadata:
     "@metamask/eslint-config-typescript": ^11.1.0
     "@metamask/snaps-cli": ^0.32.2
     "@metamask/snaps-ui": ^0.32.2
+    "@types/markdown-escape": ^1.1.0
     "@typescript-eslint/eslint-plugin": ^5.59.8
     "@typescript-eslint/parser": ^5.59.8
     cross-env: ^7.0.3
@@ -11668,6 +11676,7 @@ __metadata:
     eslint-plugin-prettier: ^4.2.1
     gatsby-cli: ^5.10.0
     gh-pages: ^5.0.0
+    markdown-escape: ^2.0.0
     prettier: ^2.8.8
     prettier-plugin-packagejson: ^2.4.3
     typescript: ^4.9.5
@@ -12159,6 +12168,13 @@ __metadata:
   version: 0.2.2
   resolution: "map-cache@npm:0.2.2"
   checksum: 3067cea54285c43848bb4539f978a15dedc63c03022abeec6ef05c8cb6829f920f13b94bcaf04142fc6a088318e564c4785704072910d120d55dbc2e0c421969
+  languageName: node
+  linkType: hard
+
+"markdown-escape@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "markdown-escape@npm:2.0.0"
+  checksum: 74c66d817636ac5f6a275fdc79ecb1e208d907ca85289d660b515256fbc3e380eb18d29b6bbbd6a77968ee4fb5872d40ecf31e52bc9f17855bb01bb723569fa0
   languageName: node
   linkType: hard
 

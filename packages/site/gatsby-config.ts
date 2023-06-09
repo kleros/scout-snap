@@ -15,8 +15,8 @@ const config: GatsbyConfig = {
       options: {
         name: 'Template Snap',
         icon: 'src/assets/logo.svg',
-        theme_color: '#6F4CFF',
-        background_color: '#FFFFFF',
+        theme_color: '#6F4CFF', // eslint-disable-line @typescript-eslint/naming-convention
+        background_color: '#FFFFFF', // eslint-disable-line @typescript-eslint/naming-convention
         display: 'standalone',
       },
     },
