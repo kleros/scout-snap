@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kleros/contract-insights-snap.git"
+    "url": "git+https://github.com/kleros/scout-snap.git"
   },
   "author": {
     "name": "Kleros",

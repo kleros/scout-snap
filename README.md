@@ -9,16 +9,16 @@
 </p>
 
 <p align="center">
-  <a href="https://api.securityscorecards.dev/projects/github.com/kleros/contract-insights-snap"><img src="https://api.securityscorecards.dev/projects/github.com/kleros/contract-insights-snap/badge" alt="OpenSSF Scorecard"></a>
-  <a href="https://app.netlify.com/sites/kleros-contract-insights-snap/deploys"><img src="https://api.netlify.com/api/v1/badges/9973b784-42ac-42ec-ba8a-c5cfc8905c54/deploy-status" alt="Netlify Status"></a>
+  <a href="https://api.securityscorecards.dev/projects/github.com/kleros/scout-snap"><img src="https://api.securityscorecards.dev/projects/github.com/kleros/scout-snap/badge" alt="OpenSSF Scorecard"></a>
+  <a href="https://app.netlify.com/sites/kleros-scout-snap/deploys"><img src="https://api.netlify.com/api/v1/badges/9973b784-42ac-42ec-ba8a-c5cfc8905c54/deploy-status" alt="Netlify Status"></a>
   </br>
   <!-- MASTER BRANCH -->
   <img src="https://img.shields.io/badge/branch-master-lightgrey">
-  <a href="https://sonarcloud.io/summary/new_code?id=kleros_contract-insights-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_contract-insights-snap&branch=master&metric=security_rating" alt="Security Rating"></a>
-  <a href="https://sonarcloud.io/summary/new_code?id=kleros_contract-insights-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_contract-insights-snap&branch=master&metric=alert_status" alt="Quality Gate Status"></a>
-  <a href="https://sonarcloud.io/summary/new_code?id=kleros_contract-insights-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_contract-insights-snap&branch=master&metric=bugs" alt="Bugs"></a>
-  <a href="https://sonarcloud.io/summary/new_code?id=kleros_contract-insights-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_contract-insights-snap&branch=master&metric=reliability_rating" alt="Reliability Rating"></a>
-  <a href="https://sonarcloud.io/summary/new_code?id=kleros_contract-insights-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_contract-insights-snap&branch=master&metric=sqale_rating" alt="Maintainability Rating"></a>
+  <a href="https://sonarcloud.io/summary/new_code?id=kleros_scout-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_scout-snap&branch=master&metric=security_rating" alt="Security Rating"></a>
+  <a href="https://sonarcloud.io/summary/new_code?id=kleros_scout-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_scout-snap&branch=master&metric=alert_status" alt="Quality Gate Status"></a>
+  <a href="https://sonarcloud.io/summary/new_code?id=kleros_scout-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_scout-snap&branch=master&metric=bugs" alt="Bugs"></a>
+  <a href="https://sonarcloud.io/summary/new_code?id=kleros_scout-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_scout-snap&branch=master&metric=reliability_rating" alt="Reliability Rating"></a>
+  <a href="https://sonarcloud.io/summary/new_code?id=kleros_scout-snap"><img src="https://sonarcloud.io/api/project_badges/measure?project=kleros_scout-snap&branch=master&metric=sqale_rating" alt="Maintainability Rating"></a>
 </p>
 
 ---

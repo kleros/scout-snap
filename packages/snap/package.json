@@ -4,7 +4,7 @@
   "description": "A Metamask Snap that retrieves contract metadata from the Kleros Curate registries",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kleros/contract-insights-snap.git"
+    "url": "https://github.com/kleros/scout-snap.git"
   },
   "author": {
     "name": "Kleros",
