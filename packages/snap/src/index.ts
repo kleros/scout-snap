@@ -28,15 +28,6 @@ type CuratedInfo = {
   token?: Token;
 };
 
-// For parsing out the domain
-const getDomainFromUrl = (url: string): string | null => {
-  const match = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/iu);
-  if (match) {
-    return match[1];
-  }
-  return null;
-};
-
 const fetchGraphQLData = async (variables: {
   targetAddress: string;
   domain: string;
@@ -209,8 +200,14 @@ export const onTransaction: OnTransactionHandler = async ({
   transaction,
   chainId,
 }) => {
-  const domain =
-    getDomainFromUrl(transactionOrigin ?? 'NO_DOMAIN') ?? 'NO_DOMAIN';
+  let domain = 'NO_DOMAIN';
+  if (transactionOrigin) {
+    try {
+      domain = new URL(transactionOrigin).hostname;
+    } catch (error) {
+      console.error(error);
+    }
+  }
   const numericChainId = parseInt(chainId.split(':')[1], 16);
   const caipAddress = `eip155:${numericChainId}:${transaction.to as string}`;
   console.log(JSON.stringify(transaction));
