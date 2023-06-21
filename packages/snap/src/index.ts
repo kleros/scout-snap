@@ -44,11 +44,16 @@ const fetchGraphQLData = async (variables: {
   // We are only interested on whether one exists, so we fetch first match.
   // 3. tokens contains names, symbols, decimals, etc, and a link to a logo.
   // Tokens cannot be dupe on address, so fetch first match.
+
+  // The way legal CAIP-10 strings work, if it starts and ends with the passed address string,
+  // no other CAIP-10 legal string should match (since it would require having more than 2 ":" characters)
+  // there is no "key0_nocase" query.
   const query = `
   query($targetAddress: String!, $domain: String!) {
     addressTags: litems(where:{
       registry:"0x66260c69d03837016d88c9877e61e08ef74c59f2",
-      key0_contains_nocase: $targetAddress,
+      key0_starts_with_nocase: $targetAddress,
+      key0_ends_with_nocase: $targetAddress,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
       itemID
@@ -60,7 +65,8 @@ const fetchGraphQLData = async (variables: {
     }
     contractDomains: litems(where:{
       registry:"0x957a53a994860be4750810131d9c876b2f52d6e1",
-      key0_contains_nocase: $targetAddress,
+      key0_starts_with_nocase: $targetAddress,
+      key0_ends_with_nocase: $targetAddress,
       key1: $domain,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
@@ -70,7 +76,8 @@ const fetchGraphQLData = async (variables: {
     }
     tokens: litems(where:{
       registry:"0x70533554fe5c17caf77fe530f77eab933b92af60",
-      key0_contains_nocase: $targetAddress,
+      key0_starts_with_nocase: $targetAddress,
+      key0_ends_with_nocase: $targetAddress,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
       itemID
