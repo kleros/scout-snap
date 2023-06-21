@@ -19,7 +19,6 @@ type Token = {
   caipAddress: string;
   name: string;
   symbol: string;
-  // info on decimals could be fetched as well, but we deliberately don't get it.
 };
 
 type CuratedInfo = {
@@ -56,12 +55,10 @@ const fetchGraphQLData = async (variables: {
       key0_ends_with_nocase: $targetAddress,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      itemID
       key0
       key1
       key2
       key3
-      key4
     }
     contractDomains: litems(where:{
       registry:"0x957a53a994860be4750810131d9c876b2f52d6e1",
@@ -70,7 +67,6 @@ const fetchGraphQLData = async (variables: {
       key1: $domain,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      itemID
       key0
       key1
     }
@@ -80,7 +76,6 @@ const fetchGraphQLData = async (variables: {
       key0_ends_with_nocase: $targetAddress,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      itemID
       key0
       key1
       key2
