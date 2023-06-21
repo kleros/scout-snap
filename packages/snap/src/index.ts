@@ -19,22 +19,12 @@ type Token = {
   caipAddress: string;
   name: string;
   symbol: string;
-  // info on decimals could be fetched as well, but we deliberately don't get it.
 };
 
 type CuratedInfo = {
   addressTag?: AddressTag;
   contractDomain?: ContractDomain;
   token?: Token;
-};
-
-// For parsing out the domain
-const getDomainFromUrl = (url: string): string | null => {
-  const match = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/iu);
-  if (match) {
-    return match[1];
-  }
-  return null;
 };
 
 const fetchGraphQLData = async (variables: {
@@ -53,36 +43,39 @@ const fetchGraphQLData = async (variables: {
   // We are only interested on whether one exists, so we fetch first match.
   // 3. tokens contains names, symbols, decimals, etc, and a link to a logo.
   // Tokens cannot be dupe on address, so fetch first match.
+
+  // The way legal CAIP-10 strings work, if it starts and ends with the passed address string,
+  // no other CAIP-10 legal string should match (since it would require having more than 2 ":" characters)
+  // there is no "key0_nocase" query.
   const query = `
   query($targetAddress: String!, $domain: String!) {
     addressTags: litems(where:{
       registry:"0x66260c69d03837016d88c9877e61e08ef74c59f2",
-      key0_contains_nocase: $targetAddress,
+      key0_starts_with_nocase: $targetAddress,
+      key0_ends_with_nocase: $targetAddress,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      itemID
       key0
       key1
       key2
       key3
-      key4
     }
     contractDomains: litems(where:{
       registry:"0x957a53a994860be4750810131d9c876b2f52d6e1",
-      key0_contains_nocase: $targetAddress,
+      key0_starts_with_nocase: $targetAddress,
+      key0_ends_with_nocase: $targetAddress,
       key1: $domain,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      itemID
       key0
       key1
     }
     tokens: litems(where:{
       registry:"0x70533554fe5c17caf77fe530f77eab933b92af60",
-      key0_contains_nocase: $targetAddress,
+      key0_starts_with_nocase: $targetAddress,
+      key0_ends_with_nocase: $targetAddress,
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      itemID
       key0
       key1
       key2
@@ -213,8 +206,14 @@ export const onTransaction: OnTransactionHandler = async ({
   transaction,
   chainId,
 }) => {
-  const domain =
-    getDomainFromUrl(transactionOrigin ?? 'NO_DOMAIN') ?? 'NO_DOMAIN';
+  let domain = 'NO_DOMAIN';
+  if (transactionOrigin) {
+    try {
+      domain = new URL(transactionOrigin).hostname;
+    } catch (error) {
+      console.error(error);
+    }
+  }
   const numericChainId = parseInt(chainId.split(':')[1], 16);
   const caipAddress = `eip155:${numericChainId}:${transaction.to as string}`;
   console.log(JSON.stringify(transaction));
