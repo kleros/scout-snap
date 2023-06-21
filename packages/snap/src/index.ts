@@ -149,15 +149,12 @@ const fetchGraphQLData = async (variables: {
  *
  * @param caipAddress - https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md
  * @param domain - Domain that launched the contract interaction
- * @param contractAddress - Hex address of the contract. todo: to be used when links are available.
  * @returns List of resolved insights to display to the user
  */
 
 const getInsights = async (
   caipAddress: string,
   domain: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  contractAddress: string,
 ): Promise<string[]> => {
   const result = await fetchGraphQLData({
     domain,
@@ -180,7 +177,10 @@ const getInsights = async (
     // Contract was not tagged in Address Tags. Let the user know, and provide a link to tag it.
     // Note: current @metamask/snaps-ui does not allow markdown links, so no links in this version.
     // todo: when links are a feature, turn them into [Tag me](https://curate.kleros.io/...), deeplink:
-    // https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2?action=submit&Public%20Name%20Tag=&Contract%20Address=${contractAddress}
+    // const uri = new URL('https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2');
+    // uri.searchParams.append('action', 'submit');
+    // uri.searchParams.append('Contract Address', caipAddress);
+    // uri.toString();
     const addressNotFound = `**Contract Tag:** _Not Found_`;
     insights.push(addressNotFound);
   }
@@ -188,7 +188,11 @@ const getInsights = async (
   const domainLabel = result.contractDomain
     ? `**Domain:** _${domain}_ is **verified** for this contract`
     : // todo: when links are a feature, deeplink:
-      // https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1?action=submit&Contract%20Address=${caipAddress}&Domain%20Name=${domain}
+      // const uri = new URL('https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1');
+      // uri.searchParams.append('action', 'submit');
+      // uri.searchParams.append('Contract Address', caipAddress);
+      // uri.searchParams.append('Domain Name', domain);
+      // uri.toString();
       `**Domain:** _${domain}_ is **NOT verified** for this contract
 `;
   insights.push(domainLabel);
@@ -215,11 +219,7 @@ export const onTransaction: OnTransactionHandler = async ({
   const caipAddress = `eip155:${numericChainId}:${transaction.to as string}`;
   console.log(JSON.stringify(transaction));
 
-  const insights = await getInsights(
-    caipAddress,
-    domain,
-    transaction.to as string,
-  );
+  const insights = await getInsights(caipAddress, domain);
 
   return {
     content: panel([
