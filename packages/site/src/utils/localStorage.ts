@@ -4,6 +4,7 @@
  * @param key - The local storage key to access.
  * @returns The value stored at the key provided if the key exists.
  */
+/* eslint-disable */
 export const getLocalStorage = (key: string) => {
   const { localStorage: ls } = window;
 

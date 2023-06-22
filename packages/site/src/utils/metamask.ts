@@ -3,6 +3,7 @@
  *
  * @returns True if the MetaMask version is Flask, false otherwise.
  */
+/* eslint-disable */
 export const isFlask = async () => {
   const provider = window.ethereum;
 

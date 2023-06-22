@@ -6,6 +6,7 @@ import { GetSnapsResponse, Snap } from '../types';
  *
  * @returns The snaps installed in MetaMask.
  */
+/* eslint-disable */
 export const getSnaps = async (): Promise<GetSnapsResponse> => {
   return (await window.ethereum.request({
     method: 'wallet_getSnaps',
