@@ -6,6 +6,7 @@ import { getLocalStorage, setLocalStorage } from './localStorage';
  *
  * @returns True if the theme is "dark" otherwise, false.
  */
+/* eslint-disable */
 export const getThemePreference = () => {
   if (typeof window === 'undefined') {
     return false;

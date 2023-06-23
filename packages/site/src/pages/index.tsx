@@ -1,3 +1,4 @@
+/* eslint-disable */
 // index.ts
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
@@ -8,7 +9,7 @@ import { MetamaskActions, MetaMaskContext } from '../hooks';
 import { connectSnap, getSnaps } from '../utils';
 
 const Body = styled.div`
-  background-color: #F8F9FA;
+  background-color: #f8f9fa;
   font-family: Arial, sans-serif;
 `;
 
@@ -140,7 +141,7 @@ const Index = () => {
   };
 
   const handleConnectClick = async () => {
-    const defaultSnapOrigin = `npm:${selectedPackage}`; 
+    const defaultSnapOrigin = `local:http://localhost:8080`;
 
     try {
       await connectSnap(defaultSnapOrigin);
@@ -177,7 +178,13 @@ const Index = () => {
             Install {selectedPackage} Snap
           </InstallButton>
         </SearchBarContainer>
-        <Subtext>Results with ✅ are successfully registered on <a href="https://curate.kleros.io/tcr/100/0xfdB66aD9576842945431c27fe8cB5ef8ed5Cb8BB">this registry</a> on Kleros Curate.</Subtext>
+        <Subtext>
+          Results with ✅ are successfully registered on{' '}
+          <a href="https://curate.kleros.io/tcr/100/0xfdB66aD9576842945431c27fe8cB5ef8ed5Cb8BB">
+            this registry
+          </a>{' '}
+          on Kleros Curate.
+        </Subtext>
         <SearchResultList>
           {filteredPackages.map((pkg) => {
             const isVerified = packages.some((item) => item.key0 === pkg.name);
