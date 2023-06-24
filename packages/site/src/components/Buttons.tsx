@@ -47,7 +47,7 @@ const ButtonForInstall = styled.button`
   font-size: 1.5rem;
   font-weight: bold;
   padding: 1rem 2rem;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: #fff;
   border: none;
   border-radius: 20px;
@@ -56,7 +56,7 @@ const ButtonForInstall = styled.button`
   height: 100%;
   &:hover {
     background-color: #1e075f;
-    color: #FFFFFF;
+    color: #ffffff;
   }
   &:disabled {
     background-color: #f2e3ff;
@@ -64,7 +64,6 @@ const ButtonForInstall = styled.button`
     color: #000000;
   }
 `;
-
 
 const ButtonText = styled.span`
   margin-left: 1rem;
@@ -108,13 +107,13 @@ export const ConnectButton = (props: ComponentProps<typeof Button>) => {
   );
 };
 
-
-
 export const InstallButton = (props: ComponentProps<typeof Button>) => {
   return (
     <ButtonForInstall {...props}>
       <FlaskFox />
-      <ButtonText>Install <i>{props.snapsNpmName}</i> </ButtonText>
+      <ButtonText>
+        Install <i>{props.snapsNpmName}</i>{' '}
+      </ButtonText>
     </ButtonForInstall>
   );
 };

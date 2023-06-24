@@ -45,13 +45,15 @@ const Description = styled.div`
   margin-bottom: 2.4rem;
 `;
 
-export const InstallCard = ({ content, disabled = false, fullWidth }: CardProps) => {
+export const InstallCard = ({
+  content,
+  disabled = false,
+  fullWidth,
+}: CardProps) => {
   const { title, description, button } = content;
   return (
     <CardWrapper fullWidth={fullWidth} disabled={disabled}>
-      {title && (
-        <Title>{title}</Title>
-      )}
+      {title && <Title>{title}</Title>}
       <Description>{description}</Description>
       {button}
     </CardWrapper>

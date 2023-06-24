@@ -30,7 +30,7 @@ type CuratedInfo = {
 const fetchGraphQLData = async (variables: {
   targetAddress: string;
   domain: string;
-}): Promise<CuratedInfo> => {
+}): Promise<CuratedInfo | null> => {
   // Comments may be added on GraphQL queries with `#`. They were purposedly
   // not added here to save data. All 3 queries below have a hardcoded
   // registry, as only one Curate TCR contract is used for each data type,
@@ -82,23 +82,34 @@ const fetchGraphQLData = async (variables: {
     }
   }
   `;
-  const response = await fetch(
-    'https://api.thegraph.com/subgraphs/name/kleros/legacy-curate-xdai',
-    {
-      method: 'POST',
-      headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
-    },
-  );
 
-  const result = await response.json();
+  let result: any;
+
+  try {
+    const response = await fetch(
+      'https://api.thegraph.com/subgraphs/name/kleros/legacy-curate-xdai',
+      {
+        method: 'POST',
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          variables,
+        }),
+      },
+    );
+
+    result = await response.json();
+    if (result.data === undefined) {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 
   // Kleros Curate is a generalized registry, and is indexed by a generalized subgraph.
   // Indexed fields are written into fields such as key0, key1...
@@ -153,6 +164,11 @@ const getInsights = async (
     domain,
     targetAddress: caipAddress,
   });
+
+  if (result === null) {
+    return ['**Error:** Could not connect to the server.'];
+  }
+
   const insights: string[] = [];
   if (result.addressTag) {
     // key2 is projectName, which is optional. No project name === "", which is falsy.

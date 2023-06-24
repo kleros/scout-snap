@@ -63,7 +63,6 @@ export const Header = ({
     <HeaderWrapper>
       <LogoWrapper>
         <KlerosLogo color={theme.colors.icon.default} size={36} />
-
       </LogoWrapper>
       <RightContainer>
         <Toggle
