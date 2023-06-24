@@ -10,25 +10,29 @@
     "type": "git",
     "url": "git+https://github.com/kleros/scout-snap.git"
   },
+  "license": "(MIT-0 OR Apache-2.0)",
   "author": {
     "name": "Kleros",
     "email": "contact@kleros.io",
     "url": "https://kleros.io"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "build": "PUBLIC_URL=/ yarn workspaces foreach --parallel --topological --verbose run build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d packages/site/public",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!**/CHANGELOG.md' '**/*.yml' --ignore-path .gitignore",
     "start": "yarn workspaces foreach --parallel --interlaced --verbose run start",
-    "test": "echo \"TODO\"",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d packages/site/public"
+    "test": "echo \"TODO\""
+  },
+  "resolutions": {
+    "engine.io@npm:~6.2.1": "^6.4.2",
+    "yaml@npm:^2.0.0": "^2.3.1"
   },
   "dependencies": {
     "@metamask/snaps-cli": "^0.32.2",
@@ -57,10 +61,6 @@
     "prettier": "^2.8.8",
     "prettier-plugin-packagejson": "^2.4.3",
     "typescript": "^4.9.5"
-  },
-  "resolutions": {
-    "yaml@npm:^2.0.0": "^2.3.1",
-    "engine.io@npm:~6.2.1": "^6.4.2"
   },
   "packageManager": "yarn@3.3.1",
   "engines": {

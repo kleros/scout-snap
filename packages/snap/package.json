@@ -6,12 +6,12 @@
     "type": "git",
     "url": "https://github.com/kleros/scout-snap.git"
   },
+  "license": "(MIT-0 OR Apache-2.0)",
   "author": {
     "name": "Kleros",
     "email": "contact@kleros.io",
     "url": "https://kleros.io"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
   "main": "src/index.ts",
   "files": [
     "dist/",
