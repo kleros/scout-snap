@@ -101,7 +101,9 @@ const fetchGraphQLData = async (variables: {
         }),
       },
     );
-
+    if (!response.ok) {
+      return null;
+    }
     result = await response.json();
     if (result.data === undefined) {
       return null;
