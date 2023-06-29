@@ -27,9 +27,9 @@
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
+    "publish": "yarn npm publish --access public",
     "serve": "mm-snap serve",
-    "start": "mm-snap watch",
-    "publish": "yarn npm publish --access public"
+    "start": "mm-snap watch"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^2.3.1",
