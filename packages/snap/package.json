@@ -1,6 +1,6 @@
 {
   "name": "@kleros/scout-snap",
-  "version": "0.5.2",
+  "version": "1.0.0",
   "description": "A Metamask Snap that retrieves contract metadata from the Kleros Curate registries",
   "repository": {
     "type": "git",
@@ -28,7 +28,8 @@
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
     "serve": "mm-snap serve",
-    "start": "mm-snap watch"
+    "start": "mm-snap watch",
+    "publish": "yarn npm publish --access public"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^2.3.1",
