@@ -9,7 +9,7 @@ import { MetamaskActions, MetaMaskContext } from '../hooks';
 import { connectSnap, getSnaps } from '../utils';
 
 const Body = styled.div`
-  background-color: #f8f9fa;
+  background-color: ${(props) => props.theme.colors.background.default};
   font-family: Arial, sans-serif;
 `;
 

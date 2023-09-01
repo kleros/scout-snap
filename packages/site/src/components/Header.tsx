@@ -1,10 +1,11 @@
 import { useContext } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
+
+import { HeaderButtons } from './Buttons';
+import { Toggle } from './Toggle';
+import { ReactComponent as KlerosLogo } from '../assets/kleros-symbol.svg';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import { connectSnap, getThemePreference, getSnap } from '../utils';
-import { HeaderButtons } from './Buttons';
-import { KlerosLogo } from './KlerosLogo';
-import { Toggle } from './Toggle';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -13,16 +14,6 @@ const HeaderWrapper = styled.header`
   align-items: center;
   padding: 2.4rem;
   border-bottom: 1px solid ${(props) => props.theme.colors.border.default};
-`;
-
-const Title = styled.p`
-  font-size: ${(props) => props.theme.fontSizes.title};
-  font-weight: bold;
-  margin: 0;
-  margin-left: 1.2rem;
-  ${({ theme }) => theme.mediaQueries.small} {
-    display: none;
-  }
 `;
 
 const LogoWrapper = styled.div`
@@ -42,7 +33,6 @@ export const Header = ({
 }: {
   handleToggleClick(): void;
 }) => {
-  const theme = useTheme();
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const handleConnectClick = async () => {
@@ -62,7 +52,7 @@ export const Header = ({
   return (
     <HeaderWrapper>
       <LogoWrapper>
-        <KlerosLogo color={theme.colors.icon.default} size={36} />
+        <KlerosLogo />
       </LogoWrapper>
       <RightContainer>
         <Toggle
