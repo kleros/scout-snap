@@ -1,5 +1,5 @@
 {
-  "version": "0.5.2",
+  "version": "1.1.0",
   "description": "A Snap that retrieves contract metadata from the Kleros Curate registries.",
   "proposedName": "Kleros Scout",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/kleros/scout-snap.git"
   },
   "source": {
-    "shasum": "PN6RaRgAWSel0csceOg3JD57metbCzVENDv0S2ONt1Q=",
+    "shasum": "z/7MIS7rM2gG7vjtY54Sv3pnvzItMnhooR22Svk6QkI=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
