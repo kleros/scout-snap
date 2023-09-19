@@ -171,6 +171,7 @@ const getInsights = async (
     return ['**Error:** Could not connect to the server.'];
   }
 
+  // If insight search has no result in a category, the result is omitted.
   const insights: string[] = [];
   if (result.addressTag) {
     // key2 is projectName, which is optional. No project name === "", which is falsy.
@@ -184,35 +185,26 @@ const getInsights = async (
     const contractTag = result.addressTag.publicName;
     insights.push(`**Project:** ${projectNameLabel}`);
     insights.push(`**Contract Tag:** ${contractTag}`);
-  } else {
-    // Contract was not tagged in Address Tags. Let the user know, and provide a link to tag it.
-    // Note: current @metamask/snaps-ui does not allow markdown links, so no links in this version.
-    // todo: when links are a feature, turn them into [Tag me](https://curate.kleros.io/...), deeplink:
-    // const uri = new URL('https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2');
-    // uri.searchParams.append('action', 'submit');
-    // uri.searchParams.append('Contract Address', caipAddress);
-    // uri.toString();
-    const addressNotFound = `**Contract Tag:** _Not Found_`;
-    insights.push(addressNotFound);
   }
 
-  const domainLabel = result.contractDomain
-    ? `**Domain:** _${domain}_ is **verified** for this contract`
-    : // todo: when links are a feature, deeplink:
-      // const uri = new URL('https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1');
-      // uri.searchParams.append('action', 'submit');
-      // uri.searchParams.append('Contract Address', caipAddress);
-      // uri.searchParams.append('Domain Name', domain);
-      // uri.toString();
-      `**Domain:** _${domain}_ is **NOT verified** for this contract
-`;
-  insights.push(domainLabel);
+  if (result.contractDomain) {
+    const domainLabel = `**Domain:** _${domain}_ is **verified** for this contract`;
+    insights.push(domainLabel);
+  }
 
-  // Token information is only shown if confirmed to be a token.
   if (result.token) {
     insights.push(
       // etherscan-like token syntax
       `**Token:** ${result.token.name} (${result.token.symbol})`,
+    );
+  }
+
+  if (insights.length === 0) {
+    insights.push(
+      'No insights available for this contract. Interact at your own risk.',
+    );
+    insights.push(
+      'Do you know this contract? Submit insights on curate.kleros.io in Gnosis Chain and earn rewards!',
     );
   }
 
@@ -245,3 +237,24 @@ export const onTransaction: OnTransactionHandler = async ({
     ]),
   };
 };
+
+/*
+  
+Note: current @metamask/snaps-ui does not allow markdown links, so no links in this version.
+todo: when links are a feature, create links to direct user towards submitting.
+or, to direct user towards seeing the submissions in case they believe they're wrong?
+
+add contract tags link:
+const uri = new URL('https://curate.kleros.io/tcr/100/0x66260c69d03837016d88c9877e61e08ef74c59f2');
+uri.searchParams.append('action', 'submit');
+uri.searchParams.append('Contract Address', caipAddress);
+uri.toString();
+
+add contract domain link:
+const uri = new URL('https://curate.kleros.io/tcr/100/0x957A53A994860BE4750810131d9c876b2f52d6E1');
+uri.searchParams.append('action', 'submit');
+uri.searchParams.append('Contract Address', caipAddress);
+uri.searchParams.append('Domain Name', domain);
+uri.toString();
+
+*/
