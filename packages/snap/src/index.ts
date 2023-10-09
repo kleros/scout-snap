@@ -71,7 +71,7 @@ const fetchGraphQLData = async (variables: {
       key1
     }
     tokens: litems(where:{
-      registry:"0x70533554fe5c17caf77fe530f77eab933b92af60",
+      registry:"0xee1502e29795ef6c2d60f8d7120596abe3bad990",
       key0_starts_with_nocase: $targetAddress,
       key0_ends_with_nocase: $targetAddress,
       status_in:[Registered, ClearingRequested]
