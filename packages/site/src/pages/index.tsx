@@ -95,16 +95,18 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.post(
-        'https://api.thegraph.com/subgraphs/name/kleros/legacy-curate-xdai',
+        'https://api.studio.thegraph.com/query/61738/legacy-curate-gnosis/version/latest',
         {
           query: `
           {
             litems(first:1000, where:{registry:"0xfdb66ad9576842945431c27fe8cb5ef8ed5cb8bb", status_in:[Registered], disputed:false})
           {
               itemID
-              key0
-              key1
-              key2
+              metadata {
+                key0
+                key1
+                key2
+              }
             }
           }
         `,
@@ -187,7 +189,7 @@ const Index = () => {
         </Subtext>
         <SearchResultList>
           {filteredPackages.map((pkg) => {
-            const isVerified = packages.some((item) => item.key0 === pkg.name);
+            const isVerified = packages.some((item) => item?.metadata?.key0 === pkg.name);
             return (
               <SearchResultItem
                 key={pkg.name}

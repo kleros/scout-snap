@@ -51,34 +51,46 @@ const fetchGraphQLData = async (variables: {
   query($targetAddress: String!, $domain: String!) {
     addressTags: litems(where:{
       registry:"0x66260c69d03837016d88c9877e61e08ef74c59f2",
-      key0_starts_with_nocase: $targetAddress,
-      key0_ends_with_nocase: $targetAddress,
+      metadata_: {
+        key0_starts_with_nocase: $targetAddress,
+        key0_ends_with_nocase: $targetAddress,
+      },
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      key0
-      key1
-      key2
-      key3
+      metadata {
+        key0
+        key1
+        key2
+        key3
+      }
     }
     contractDomains: litems(where:{
       registry:"0x957a53a994860be4750810131d9c876b2f52d6e1",
-      key0_starts_with_nocase: $targetAddress,
-      key0_ends_with_nocase: $targetAddress,
-      key1: $domain,
+      metadata_: {
+        key0_starts_with_nocase: $targetAddress,
+        key0_ends_with_nocase: $targetAddress,
+        key1: $domain,
+      },
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      key0
-      key1
+      metadata {
+        key0
+        key1
+      }
     }
     tokens: litems(where:{
       registry:"0x70533554fe5c17caf77fe530f77eab933b92af60",
-      key0_starts_with_nocase: $targetAddress,
-      key0_ends_with_nocase: $targetAddress,
+      metadata_: {
+        key0_starts_with_nocase: $targetAddress,
+        key0_ends_with_nocase: $targetAddress,
+      },
       status_in:[Registered, ClearingRequested]
     }, first: 1) {
-      key0
-      key1
-      key2
+      metadata {
+        key0
+        key1
+        key2
+      }
     }
   }
   `;
@@ -87,7 +99,7 @@ const fetchGraphQLData = async (variables: {
 
   try {
     const response = await fetch(
-      'https://api.thegraph.com/subgraphs/name/kleros/legacy-curate-xdai',
+      'https://api.studio.thegraph.com/query/61738/legacy-curate-gnosis/version/latest',
       {
         method: 'POST',
         headers: {
@@ -119,26 +131,26 @@ const fetchGraphQLData = async (variables: {
 
   const parsedAddressTag: AddressTag | undefined = result.data.addressTags[0]
     ? {
-        caipAddress: mdEscape(result.data.addressTags[0].key0),
-        publicName: mdEscape(result.data.addressTags[0].key1),
-        projectName: mdEscape(result.data.addressTags[0].key2),
-        infoLink: mdEscape(result.data.addressTags[0].key3),
+        caipAddress: mdEscape(result.data.addressTags[0]?.metadata?.key0),
+        publicName: mdEscape(result.data.addressTags[0]?.metadata?.key1),
+        projectName: mdEscape(result.data.addressTags[0]?.metadata?.key2),
+        infoLink: mdEscape(result.data.addressTags[0]?.metadata?.key3),
       }
     : undefined;
 
   const parsedContractDomain: ContractDomain | undefined = result.data
     .contractDomains[0]
     ? {
-        caipAddress: mdEscape(result.data.contractDomains[0].key0),
-        domain: mdEscape(result.data.contractDomains[0].key1),
+        caipAddress: mdEscape(result.data.contractDomains[0]?.metadata?.key0),
+        domain: mdEscape(result.data.contractDomains[0]?.metadata?.key1),
       }
     : undefined;
 
   const parsedToken: Token | undefined = result.data.tokens[0]
     ? {
-        caipAddress: mdEscape(result.data.tokens[0].key0),
-        name: mdEscape(result.data.tokens[0].key1),
-        symbol: mdEscape(result.data.tokens[0].key2),
+        caipAddress: mdEscape(result.data.tokens[0]?.metadata?.key0),
+        name: mdEscape(result.data.tokens[0]?.metadata?.key1),
+        symbol: mdEscape(result.data.tokens[0]?.metadata?.key2),
       }
     : undefined;
 
