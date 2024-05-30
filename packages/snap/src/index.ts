@@ -131,26 +131,26 @@ const fetchGraphQLData = async (variables: {
 
   const parsedAddressTag: AddressTag | undefined = result.data.addressTags[0]
     ? {
-        caipAddress: mdEscape(result.data.addressTags[0]?.metadata?.key0),
-        publicName: mdEscape(result.data.addressTags[0]?.metadata?.key1),
-        projectName: mdEscape(result.data.addressTags[0]?.metadata?.key2),
-        infoLink: mdEscape(result.data.addressTags[0]?.metadata?.key3),
+        caipAddress: mdEscape(result.data.addressTags[0].metadata.key0),
+        publicName: mdEscape(result.data.addressTags[0].metadata.key1),
+        projectName: mdEscape(result.data.addressTags[0].metadata.key2),
+        infoLink: mdEscape(result.data.addressTags[0].metadata.key3),
       }
     : undefined;
 
   const parsedContractDomain: ContractDomain | undefined = result.data
     .contractDomains[0]
     ? {
-        caipAddress: mdEscape(result.data.contractDomains[0]?.metadata?.key0),
-        domain: mdEscape(result.data.contractDomains[0]?.metadata?.key1),
+        caipAddress: mdEscape(result.data.contractDomains[0].metadata.key0),
+        domain: mdEscape(result.data.contractDomains[0].metadata.key1),
       }
     : undefined;
 
   const parsedToken: Token | undefined = result.data.tokens[0]
     ? {
-        caipAddress: mdEscape(result.data.tokens[0]?.metadata?.key0),
-        name: mdEscape(result.data.tokens[0]?.metadata?.key1),
-        symbol: mdEscape(result.data.tokens[0]?.metadata?.key2),
+        caipAddress: mdEscape(result.data.tokens[0].metadata.key0),
+        name: mdEscape(result.data.tokens[0].metadata.key1),
+        symbol: mdEscape(result.data.tokens[0].metadata.key2),
       }
     : undefined;
 
