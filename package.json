@@ -35,8 +35,8 @@
     "yaml@npm:^2.0.0": "^2.3.1"
   },
   "dependencies": {
-    "@metamask/snaps-cli": "5.0.0",
-    "@metamask/snaps-sdk": "3.0.1",
+    "@metamask/snaps-cli": "6.2.0",
+    "@metamask/snaps-sdk": "5.0.0",
     "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "gatsby-cli": "^5.13.3",

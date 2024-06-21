@@ -1,8 +1,12 @@
-/* eslint-disable prettier/prettier */
-import type { OnTransactionHandler, OnInstallHandler, OnUpdateHandler, OnHomePageHandler  } from '@metamask/snaps-sdk';
+import type {
+  OnTransactionHandler,
+  OnInstallHandler,
+  OnUpdateHandler,
+  OnHomePageHandler,
+} from '@metamask/snaps-sdk';
 import { panel, heading, divider, text, image } from '@metamask/snaps-sdk';
-import Install from "\image.png";
-import Image from "\image1.png";
+import InsightsDisplayImage from '../images/insights-display.png';
+import ProcessExplanationImage from '../images/process-explanation.png';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
 
@@ -229,21 +233,29 @@ const getInsights = async (
 
 export const onInstall: OnInstallHandler = async () => {
   await snap.request({
-    method: "snap_dialog",
+    method: 'snap_dialog',
     params: {
-      type: "alert",
+      type: 'alert',
       content: panel([
-        heading("Kleros Scout’s community curated contract insights secures your dApp browsing."),
+        heading(
+          'Kleros Scout’s community curated contract insights secures your dApp browsing.',
+        ),
         text(
-          "Congrats on taking a crucial step towards safeguarding your wallet interactions!",
+          'Congrats on taking a crucial step towards safeguarding your wallet interactions!',
         ),
         divider(),
-        heading("How to use the Snap?"),
-        text("The Kleros Scout Snap provides 3 points of insight on every transaction:"),
-        text("**Project:** _Which project does the contract you’re interacting with belong to?_"),
-        text("**Contract Tag:** _What is the function or tag associated with the smart contract?_"),
-        text("**Domain:** _Which domain(s) is this contract interacted in?_"),
-        image(Install),
+        heading('How to use the Snap?'),
+        text(
+          'The Kleros Scout Snap provides 3 points of insight on every transaction:',
+        ),
+        text(
+          '**Project:** _Which project does the contract you’re interacting with belong to?_',
+        ),
+        text(
+          '**Contract Tag:** _What is the function or tag associated with the smart contract?_',
+        ),
+        text('**Domain:** _Which domain(s) is this contract interacted in?_'),
+        image(InsightsDisplayImage),
       ]),
     },
   });
@@ -252,28 +264,28 @@ export const onInstall: OnInstallHandler = async () => {
 export const onHomePage: OnHomePageHandler = async () => {
   return {
     content: panel([
-      heading("Kleros Scout’s community curated contract insights secures your dApp browsing."),
+      heading(
+        'Kleros Scout’s community curated contract insights secures your dApp browsing.',
+      ),
       divider(),
-      heading("How does it work?"),
-      text("Anyone can submit contract insights & earn upto $15 per entry! [Head here to know more.](https://klerosscout.eth.limo)"),
-      image(Image),
+      heading('How does it work?'),
+      text(
+        'Anyone can submit contract insights & earn upto $15 per entry! [Head here to know more.](https://klerosscout.eth.limo)',
+      ),
+      image(ProcessExplanationImage),
     ]),
   };
 };
 
 export const onUpdate: OnUpdateHandler = async () => {
   await snap.request({
-    method: "snap_dialog",
+    method: 'snap_dialog',
     params: {
-      type: "alert",
+      type: 'alert',
       content: panel([
-        heading("Update successful"),
-        text(
-          "New features added in this version:",
-        ),
-        text(
-          ""
-        ), 
+        heading('Update successful'),
+        text('New features added in this version:'),
+        text(''),
       ]),
     },
   });
