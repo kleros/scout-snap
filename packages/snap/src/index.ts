@@ -288,7 +288,7 @@ export const onUpdate: OnUpdateHandler = async () => {
       type: 'alert',
       content: panel([
         heading('Update successful'),
-        text('New features added in this version:'),
+        text('New features added in this version.'),
         text(''),
       ]),
     },
