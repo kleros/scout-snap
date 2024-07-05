@@ -1,12 +1,16 @@
-import type {
+import {
+  OnHomePageHandler,
+  OnUpdateHandler,
   OnTransactionHandler,
   OnInstallHandler,
-  OnUpdateHandler,
-  OnHomePageHandler,
+  panel,
+  text,
+  heading,
+  divider,
+  image,
 } from '@metamask/snaps-sdk';
-import { panel, heading, divider, text, image } from '@metamask/snaps-sdk';
 import InsightsDisplayImage from '../images/insights-display.png';
-import ProcessExplanationImage from '../images/process-explanation.png';
+import ProcessExplanationImage from '../images/process-explanation.svg';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
 
@@ -224,7 +228,7 @@ const getInsights = async (
       'No insights available for this contract. Interact at your own risk.',
     );
     insights.push(
-      'Do you know this contract? Submit insights on curate.kleros.io in Gnosis Chain and earn rewards!',
+      'Do you know this contract? Submit insights on [curate.kleros.io](https://curate.kleros.io) in Gnosis Chain and earn rewards!',
     );
   }
 
@@ -270,7 +274,7 @@ export const onHomePage: OnHomePageHandler = async () => {
       divider(),
       heading('How does it work?'),
       text(
-        'Anyone can submit contract insights & earn upto $15 per entry! [Head here to know more.](https://klerosscout.eth.limo)',
+        'Anyone can submit contract insights & earn up to $15 per entry! [Head here to know more.](https://klerosscout.eth.limo)',
       ),
       image(ProcessExplanationImage),
     ]),
