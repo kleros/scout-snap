@@ -227,8 +227,11 @@ const getInsights = async (
     insights.push(
       'No insights available for this contract. Interact at your own risk.',
     );
+
+    const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
+
     insights.push(
-      'Do you know this contract? Submit insights on [curate.kleros.io](https://curate.kleros.io) in Gnosis Chain and earn rewards!',
+      `Do you know this contract? Submit insights on the Scout App as a [Contract to Domain name](${cdnPathURL}) in Gnosis Chain and earn rewards!`,
     );
   }
 
