@@ -9,10 +9,10 @@ import {
   divider,
   image,
 } from '@metamask/snaps-sdk';
-import InsightsDisplayImage from '../images/insights-display.png';
-import ProcessExplanationImage from '../images/process-explanation.svg';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
+import InsightsDisplayImage from '../images/insights-display.png';
+import ProcessExplanationImage from '../images/process-explanation.svg';
 
 // Define types
 type AddressTag = {

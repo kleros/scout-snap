@@ -3412,34 +3412,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kleros/scout-snap@workspace:packages/snap":
-  version: 0.0.0-use.local
-  resolution: "@kleros/scout-snap@workspace:packages/snap"
-  dependencies:
-    "@lavamoat/allow-scripts": ^2.5.1
-    "@metamask/auto-changelog": ^3.4.4
-    "@metamask/eslint-config": ^11.1.0
-    "@metamask/eslint-config-jest": ^11.1.0
-    "@metamask/eslint-config-nodejs": ^11.1.0
-    "@metamask/eslint-config-typescript": ^11.1.0
-    "@metamask/snaps-cli": ^6.0.2
-    "@metamask/snaps-sdk": ^3.1.1
-    "@typescript-eslint/eslint-plugin": ^5.62.0
-    "@typescript-eslint/parser": ^5.62.0
-    eslint: ^8.57.0
-    eslint-config-prettier: ^8.10.0
-    eslint-plugin-import: ^2.29.1
-    eslint-plugin-jest: ^26.9.0
-    eslint-plugin-jsdoc: ^39.9.1
-    eslint-plugin-node: ^11.1.0
-    eslint-plugin-prettier: ^4.2.1
-    prettier: ^2.8.8
-    prettier-plugin-packagejson: ^2.5.0
-    rimraf: ^3.0.2
-    typescript: ^4.9.5
-  languageName: unknown
-  linkType: soft
-
 "@kleros/scout@workspace:.":
   version: 0.0.0-use.local
   resolution: "@kleros/scout@workspace:."
@@ -18098,6 +18070,34 @@ __metadata:
   checksum: 5f01201f4ef504d4c6a9d0d283fa17075f6770bfbe4c5850b074974c68062f37929ca61700d95ad2ac8822e14e8c4b990ca0e6e9272e64befd74ce5e19f0736b
   languageName: node
   linkType: hard
+
+"shub-scout-snap@workspace:packages/snap":
+  version: 0.0.0-use.local
+  resolution: "shub-scout-snap@workspace:packages/snap"
+  dependencies:
+    "@lavamoat/allow-scripts": ^2.5.1
+    "@metamask/auto-changelog": ^3.4.4
+    "@metamask/eslint-config": ^11.1.0
+    "@metamask/eslint-config-jest": ^11.1.0
+    "@metamask/eslint-config-nodejs": ^11.1.0
+    "@metamask/eslint-config-typescript": ^11.1.0
+    "@metamask/snaps-cli": ^6.0.2
+    "@metamask/snaps-sdk": ^3.1.1
+    "@typescript-eslint/eslint-plugin": ^5.62.0
+    "@typescript-eslint/parser": ^5.62.0
+    eslint: ^8.57.0
+    eslint-config-prettier: ^8.10.0
+    eslint-plugin-import: ^2.29.1
+    eslint-plugin-jest: ^26.9.0
+    eslint-plugin-jsdoc: ^39.9.1
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-prettier: ^4.2.1
+    prettier: ^2.8.8
+    prettier-plugin-packagejson: ^2.5.0
+    rimraf: ^3.0.2
+    typescript: ^4.9.5
+  languageName: unknown
+  linkType: soft
 
 "side-channel@npm:^1.0.4":
   version: 1.0.4
