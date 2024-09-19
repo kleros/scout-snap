@@ -11,7 +11,7 @@ import {
 } from '@metamask/snaps-sdk';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
-import InsightsDisplayImage from '../images/insights-display.png';
+import InsightsDisplayImage from '../images/insights-display.svg';
 import ProcessExplanationImage from '../images/process-explanation.svg';
 
 // Define types
@@ -228,11 +228,21 @@ const getInsights = async (
       'No insights available for this contract. Interact at your own risk.',
     );
 
-    const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
+    const excludedDomains = [
+      'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
+      'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
+      'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
+      'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',
+      'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 'celoscan.io'
+    ];
 
-    insights.push(
-      `Do you know this contract? Submit insights on the Scout App as a [Contract to Domain name](${cdnPathURL}) in Gnosis Chain and earn rewards!`,
-    );
+    if (!excludedDomains.includes(domain)) {
+      const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
+
+      insights.push(
+        `Is this contract linked to this domain? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`,
+      );
+    }
   }
 
   return insights;
@@ -261,7 +271,7 @@ export const onInstall: OnInstallHandler = async () => {
         text(
           '**Contract Tag:** _What is the function or tag associated with the smart contract?_',
         ),
-        text('**Domain:** _Which domain(s) is this contract interacted in?_'),
+        text('**Domain:** _Whether this contract is known to be used on this domain?_'),
         image(InsightsDisplayImage),
       ]),
     },
@@ -282,20 +292,6 @@ export const onHomePage: OnHomePageHandler = async () => {
       image(ProcessExplanationImage),
     ]),
   };
-};
-
-export const onUpdate: OnUpdateHandler = async () => {
-  await snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'alert',
-      content: panel([
-        heading('Update successful'),
-        text('New features added in this version.'),
-        text(''),
-      ]),
-    },
-  });
 };
 
 export const onTransaction: OnTransactionHandler = async ({
