@@ -1,13 +1,12 @@
 import {
   OnHomePageHandler,
-  OnUpdateHandler,
   OnTransactionHandler,
   OnInstallHandler,
   panel,
   text,
   heading,
   divider,
-  image,
+  image
 } from '@metamask/snaps-sdk';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
@@ -197,6 +196,8 @@ const getInsights = async (
 
   // If insight search has no result in a category, the result is omitted.
   const insights: string[] = [];
+  let hasCDNInsight = false;
+
   if (result.addressTag) {
     // key2 is projectName, which is optional. No project name === "", which is falsy.
     const projectNameLabel = result.addressTag.projectName
@@ -214,6 +215,7 @@ const getInsights = async (
   if (result.contractDomain) {
     const domainLabel = `**Domain:** _${domain}_ is **verified** for this contract`;
     insights.push(domainLabel);
+    hasCDNInsight = true;
   }
 
   if (result.token) {
@@ -236,7 +238,7 @@ const getInsights = async (
       'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 'celoscan.io'
     ];
 
-    if (!excludedDomains.includes(domain)) {
+    if (!excludedDomains.includes(domain) && !hasCDNInsight) {
       const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
 
       insights.push(
