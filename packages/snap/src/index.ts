@@ -229,22 +229,22 @@ const getInsights = async (
     insights.push(
       'No insights available for this contract. Interact at your own risk.',
     );
+  }
 
-    const excludedDomains = [
-      'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
-      'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
-      'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
-      'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',
-      'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 'celoscan.io'
-    ];
+  const excludedDomains = [
+    'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
+    'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
+    'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
+    'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',
+    'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 'celoscan.io'
+  ];
 
-    if (!excludedDomains.includes(domain) && !hasCDNInsight) {
-      const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
+  if (!excludedDomains.includes(domain) && !hasCDNInsight) {
+    const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
 
-      insights.push(
-        `Is this contract linked to this domain? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`,
-      );
-    }
+    insights.push(
+      `Is this contract linked to this domain? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`,
+    );
   }
 
   return insights;
