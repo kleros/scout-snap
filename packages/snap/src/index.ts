@@ -6,7 +6,9 @@ import {
   text,
   heading,
   divider,
-  image
+  image,
+  OnSignatureHandler,
+  SeverityLevel
 } from '@metamask/snaps-sdk';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
@@ -320,6 +322,32 @@ export const onTransaction: OnTransactionHandler = async ({
       heading('Contract insights'),
       ...insights.map((insight) => text(insight)),
     ]),
+  };
+};
+export const onSignature: OnSignatureHandler = async ({ signature }) => {
+  const { signatureMethod, from, data } = signature;
+  const insights: string[] = [];
+
+  if (
+    signatureMethod === 'eth_signTypedData_v3' ||
+    signatureMethod === 'eth_signTypedData_v4'
+  ) {
+    const verifyingContract = data.domain.verifyingContract;
+    const result = await getInsights(verifyingContract, from || 'NO_DOMAIN');
+
+    if (result.length > 0) {
+      insights.push(...result);
+    } else {
+      insights.push('No insights available for this contract. Interact at your own risk.');
+    }
+  }
+
+  return {
+    content: panel([
+      heading('Signature Insights'),
+      ...insights.map((insight) => text(insight)),
+    ]),
+    severity: SeverityLevel.Critical,
   };
 };
 

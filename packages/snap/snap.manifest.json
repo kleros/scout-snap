@@ -7,7 +7,7 @@
     "url": "https://github.com/kleros/scout-snap.git"
   },
   "source": {
-    "shasum": "iEzGJxkU2eN++DN1/T/HTq3a7qXWOvIN6oOADC4qyks=",
+    "shasum": "DlqfDuDIuE5TUyxf/9WDqcnL4mqh4SBnK2LUQ1IKkyg=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -20,6 +20,9 @@
   "initialPermissions": {
     "endowment:transaction-insight": {
       "allowTransactionOrigin": true
+    },
+    "endowment:signature-insight": {
+      "allowSignatureOrigin": true
     },
     "endowment:network-access": {},
     "endowment:page-home": {},
