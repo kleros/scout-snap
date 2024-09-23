@@ -4,7 +4,7 @@ This Snap pulls contract metadata from Kleros's decentralized token curated regi
 
 ## Publication to NPM
 
-1. Bump the version in `package.json`
+1. Bump the version in `package.json` and `snap.manifest.json`
 1. Run a clean build: `yarn clean && yarn build`
 1. Commit the change to git: `git add -u ; git commit -m "chore: release"`
 1. Tag this version: `version=v$(cat package.json | jq -r .version) && git tag -m $version $version`
