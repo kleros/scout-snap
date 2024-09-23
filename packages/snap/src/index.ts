@@ -324,6 +324,7 @@ export const onTransaction: OnTransactionHandler = async ({
     ]),
   };
 };
+
 export const onSignature: OnSignatureHandler = async ({ signature }) => {
   const { signatureMethod, from, data } = signature;
   const insights: string[] = [];
@@ -332,13 +333,17 @@ export const onSignature: OnSignatureHandler = async ({ signature }) => {
     signatureMethod === 'eth_signTypedData_v3' ||
     signatureMethod === 'eth_signTypedData_v4'
   ) {
-    const verifyingContract = data.domain.verifyingContract;
-    const result = await getInsights(verifyingContract, from || 'NO_DOMAIN');
+    const verifyingContract = data?.domain?.verifyingContract;
+    if (verifyingContract) {
+      const result = await getInsights(verifyingContract, from || 'NO_DOMAIN');
 
-    if (result.length > 0) {
-      insights.push(...result);
+      if (result.length > 0) {
+        insights.push(...result);
+      } else {
+        insights.push('No insights available for this contract. Interact at your own risk.');
+      }
     } else {
-      insights.push('No insights available for this contract. Interact at your own risk.');
+      insights.push('No verifying contract found in the signature data.');
     }
   }
 
