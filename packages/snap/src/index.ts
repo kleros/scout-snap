@@ -183,9 +183,9 @@ const getInsights = async (
   if (result.addressTag) {
     // key2 is projectName, which is optional. No project name === "", which is falsy.
     const projectNameLabel = result.addressTag.projectName
-      ? // If there is a project name, we TRUST the registry to pass a link.
-        // todo: when links are a feature, use result.addressTag.infoLink and turn into markdown link
-        result.addressTag.projectName
+      ? result.addressTag.infoLink
+        ? `[${result.addressTag.projectName}](${result.addressTag.infoLink})`
+        : result.addressTag.projectName
       : '_N.A._';
     // Don't handle "" because the registry _MUST NOT_ accept it. The registry is TRUSTED.
     // Contract tag is a mandatory field.
@@ -195,15 +195,11 @@ const getInsights = async (
   }
 
   if (result.contractDomain) {
-    const domainLabel = `**Domain:** _${domain}_ is **verified** for this contract`;
-    insights.push(domainLabel);
+    insights.push(`**Domain:** _${domain}_ is **verified** for this contract`);
   }
 
   if (result.token) {
-    insights.push(
-      // etherscan-like token syntax
-      `**Token:** ${result.token.name} (${result.token.symbol})`,
-    );
+    insights.push(`**Token:** ${result.token.name} (${result.token.symbol})`);
   }
 
   return insights;
