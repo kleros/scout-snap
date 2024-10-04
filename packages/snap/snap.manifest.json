@@ -7,7 +7,7 @@
     "url": "https://github.com/kleros/scout-snap.git"
   },
   "source": {
-    "shasum": "ZPa+cVIYxWQtTVgnX38Z18BQZRsvF20Bx7OSdNBd6so=",
+    "shasum": "101pqTiRUPlNHKIW1NCNYPi/a4eXhRETwcr+tId7MhI=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
