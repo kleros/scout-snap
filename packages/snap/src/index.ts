@@ -321,7 +321,7 @@ export const onSignature: OnSignatureHandler = async ({ signature, signatureOrig
     } else {
       insights.push('No verifying contract found in the signature data.');
     }
-  }
+  } else return null;
 
   return {
     content: panel([
