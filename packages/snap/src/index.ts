@@ -1,8 +1,19 @@
-import { OnTransactionHandler } from '@metamask/snaps-types';
-import { panel, heading, text } from '@metamask/snaps-ui';
+import {
+  OnHomePageHandler,
+  OnTransactionHandler,
+  OnInstallHandler,
+  panel,
+  text,
+  heading,
+  divider,
+  image
+} from '@metamask/snaps-sdk';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
+import InsightsDisplayImage from '../images/insights-display.svg';
+import ProcessExplanationImage from '../images/process-explanation.svg';
 
+// Define types
 type AddressTag = {
   caipAddress: string;
   publicName: string;
@@ -185,6 +196,8 @@ const getInsights = async (
 
   // If insight search has no result in a category, the result is omitted.
   const insights: string[] = [];
+  let hasCDNInsight = false;
+
   if (result.addressTag) {
     // key2 is projectName, which is optional. No project name === "", which is falsy.
     const projectNameLabel = result.addressTag.projectName
@@ -202,6 +215,7 @@ const getInsights = async (
   if (result.contractDomain) {
     const domainLabel = `**Domain:** _${domain}_ is **verified** for this contract`;
     insights.push(domainLabel);
+    hasCDNInsight = true;
   }
 
   if (result.token) {
@@ -215,12 +229,71 @@ const getInsights = async (
     insights.push(
       'No insights available for this contract. Interact at your own risk.',
     );
+  }
+
+  const excludedDomains = [
+    'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
+    'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
+    'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
+    'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',
+    'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 'celoscan.io'
+  ];
+
+  if (!excludedDomains.includes(domain) && !hasCDNInsight) {
+    const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
+
     insights.push(
-      'Do you know this contract? Submit insights on curate.kleros.io in Gnosis Chain and earn rewards!',
+      `Is this contract linked to this domain? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`,
     );
   }
 
   return insights;
+};
+
+export const onInstall: OnInstallHandler = async () => {
+  await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: panel([
+        heading(
+          'Kleros Scout’s community curated contract insights secures your dApp browsing.',
+        ),
+        text(
+          'Congrats on taking a crucial step towards safeguarding your wallet interactions!',
+        ),
+        divider(),
+        heading('How to use the Snap?'),
+        text(
+          'The Kleros Scout Snap provides 3 points of insight on every transaction:',
+        ),
+        text(
+          '**Project:** _Which project does the contract you’re interacting with belong to?_',
+        ),
+        text(
+          '**Contract Tag:** _What is the function or tag associated with the smart contract?_',
+        ),
+        text('**Domain:** _Whether this contract is known to be used on this domain?_'),
+        image(InsightsDisplayImage),
+      ]),
+    },
+  });
+};
+
+export const onHomePage: OnHomePageHandler = async () => {
+  return {
+    content: panel([
+      heading(
+        'Kleros Scout’s community curated contract insights secures your dApp browsing.',
+      ),
+      divider(),
+      heading('How does it work?'),
+      text(
+        'Anyone can submit contract insights & earn up to $15 per entry! [Head here to know more.](https://klerosscout.eth.limo)',
+      ),
+      image(ProcessExplanationImage),
+    ]),
+  };
 };
 
 export const onTransaction: OnTransactionHandler = async ({
