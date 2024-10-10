@@ -6,7 +6,9 @@ import {
   text,
   heading,
   divider,
-  image
+  image,
+  OnSignatureHandler,
+  SeverityLevel
 } from '@metamask/snaps-sdk';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
@@ -36,6 +38,13 @@ type CuratedInfo = {
   addressTag?: AddressTag;
   contractDomain?: ContractDomain;
   token?: Token;
+};
+
+const parseMetadata = (metadata: any, keys: string[]) => {
+  return keys.reduce((acc, key, index) => {
+    acc[key] = mdEscape(metadata[`key${index}`]);
+    return acc;
+  }, {} as any);
 };
 
 const fetchGraphQLData = async (variables: {
@@ -106,8 +115,6 @@ const fetchGraphQLData = async (variables: {
   }
   `;
 
-  let result: any;
-
   try {
     const response = await fetch(
       'https://api.studio.thegraph.com/query/61738/legacy-curate-gnosis/version/latest',
@@ -118,59 +125,35 @@ const fetchGraphQLData = async (variables: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-        body: JSON.stringify({
-          query,
-          variables,
-        }),
+        body: JSON.stringify({ query, variables }),
       },
     );
-    if (!response.ok) {
-      return null;
-    }
-    result = await response.json();
-    if (result.data === undefined) {
-      return null;
-    }
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
 
   // Kleros Curate is a generalized registry, and is indexed by a generalized subgraph.
   // Indexed fields are written into fields such as key0, key1...
   // To make this code more readable, they are parsed onto the types at the beginning of this file.
+    if (!response.ok) return null;
 
-  const parsedAddressTag: AddressTag | undefined = result.data.addressTags[0]
-    ? {
-        caipAddress: mdEscape(result.data.addressTags[0].metadata.key0),
-        publicName: mdEscape(result.data.addressTags[0].metadata.key1),
-        projectName: mdEscape(result.data.addressTags[0].metadata.key2),
-        infoLink: mdEscape(result.data.addressTags[0].metadata.key3),
-      }
-    : undefined;
+    const result = await response.json();
+    if (!result.data) return null;
 
-  const parsedContractDomain: ContractDomain | undefined = result.data
-    .contractDomains[0]
-    ? {
-        caipAddress: mdEscape(result.data.contractDomains[0].metadata.key0),
-        domain: mdEscape(result.data.contractDomains[0].metadata.key1),
-      }
-    : undefined;
+    const parsedAddressTag = result.data.addressTags[0]
+      ? parseMetadata(result.data.addressTags[0].metadata, ['caipAddress', 'publicName', 'projectName', 'infoLink'])
+      : undefined;
 
-  const parsedToken: Token | undefined = result.data.tokens[0]
-    ? {
-        caipAddress: mdEscape(result.data.tokens[0].metadata.key0),
-        name: mdEscape(result.data.tokens[0].metadata.key1),
-        symbol: mdEscape(result.data.tokens[0].metadata.key2),
-      }
-    : undefined;
+    const parsedContractDomain = result.data.contractDomains[0]
+      ? parseMetadata(result.data.contractDomains[0].metadata, ['caipAddress', 'domain'])
+      : undefined;
 
-  const curatedInfo: CuratedInfo = {
-    addressTag: parsedAddressTag,
-    contractDomain: parsedContractDomain,
-    token: parsedToken,
-  };
-  return curatedInfo;
+    const parsedToken = result.data.tokens[0]
+      ? parseMetadata(result.data.tokens[0].metadata, ['caipAddress', 'name', 'symbol'])
+      : undefined;
+
+    return { addressTag: parsedAddressTag, contractDomain: parsedContractDomain, token: parsedToken };
+  } catch (error) {
+    console.error('GraphQL fetch error:', error);
+    return null;
+  }
 };
 
 /**
@@ -196,14 +179,13 @@ const getInsights = async (
 
   // If insight search has no result in a category, the result is omitted.
   const insights: string[] = [];
-  let hasCDNInsight = false;
 
   if (result.addressTag) {
     // key2 is projectName, which is optional. No project name === "", which is falsy.
     const projectNameLabel = result.addressTag.projectName
-      ? // If there is a project name, we TRUST the registry to pass a link.
-        // todo: when links are a feature, use result.addressTag.infoLink and turn into markdown link
-        result.addressTag.projectName
+      ? result.addressTag.infoLink
+        ? `[${result.addressTag.projectName}](${result.addressTag.infoLink})`
+        : result.addressTag.projectName
       : '_N.A._';
     // Don't handle "" because the registry _MUST NOT_ accept it. The registry is TRUSTED.
     // Contract tag is a mandatory field.
@@ -213,38 +195,11 @@ const getInsights = async (
   }
 
   if (result.contractDomain) {
-    const domainLabel = `**Domain:** _${domain}_ is **verified** for this contract`;
-    insights.push(domainLabel);
-    hasCDNInsight = true;
+    insights.push(`**Domain:** _${domain}_ is **verified** for this contract`);
   }
 
   if (result.token) {
-    insights.push(
-      // etherscan-like token syntax
-      `**Token:** ${result.token.name} (${result.token.symbol})`,
-    );
-  }
-
-  if (insights.length === 0) {
-    insights.push(
-      'No insights available for this contract. Interact at your own risk.',
-    );
-  }
-
-  const excludedDomains = [
-    'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
-    'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
-    'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
-    'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',
-    'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 'celoscan.io'
-  ];
-
-  if (!excludedDomains.includes(domain) && !hasCDNInsight) {
-    const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
-
-    insights.push(
-      `Is this contract linked to this domain? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`,
-    );
+    insights.push(`**Token:** ${result.token.name} (${result.token.symbol})`);
   }
 
   return insights;
@@ -302,24 +257,78 @@ export const onTransaction: OnTransactionHandler = async ({
   chainId,
 }) => {
   let domain = 'NO_DOMAIN';
+  const insights: string[] = [];
   if (transactionOrigin) {
     try {
       domain = new URL(transactionOrigin).hostname;
     } catch (error) {
-      console.error(error);
+      console.error('Invalid transaction origin:', error);
     }
   }
   const numericChainId = parseInt(chainId.split(':')[1], 16);
   const caipAddress = `eip155:${numericChainId}:${transaction.to as string}`;
-  console.log(JSON.stringify(transaction));
 
-  const insights = await getInsights(caipAddress, domain);
+  const result = await getInsights(caipAddress, domain);
+
+  if (result.length > 0) {
+    insights.push(...result);
+  } else {
+    insights.push(`No insights available for this contract. Interact at your own risk.`);
+  }
+
+  const excludedDomains = [
+    'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
+    'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
+    'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
+    'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',
+    'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 'celoscan.io'
+  ];
+
+  if (!excludedDomains.includes(domain) && !insights.some(insight => insight.includes('Domain'))) {
+    const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
+
+    insights.push(`Is this contract linked to this domain? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`);
+  }
 
   return {
     content: panel([
       heading('Contract insights'),
       ...insights.map((insight) => text(insight)),
     ]),
+  };
+};
+
+export const onSignature: OnSignatureHandler = async ({ signature, signatureOrigin }) => {
+  const { signatureMethod, data } = signature;
+  const insights: string[] = [];
+
+  if (
+    signatureMethod === 'eth_signTypedData_v3' ||
+    signatureMethod === 'eth_signTypedData_v4'
+  ) {
+    const verifyingContract = data?.domain?.verifyingContract;
+    const numericChainId = data?.domain?.chainId;
+    const caipAddress = `eip155:${numericChainId}:${verifyingContract as string}`;
+
+    if (verifyingContract) {
+      const result = await getInsights(caipAddress, signatureOrigin || 'NO_DOMAIN');
+
+      if (result.length > 0) {
+        insights.push(...result);
+      } else {
+        insights.push('No insights available for this contract. Interact at your own risk.');
+      }
+    } else {
+      insights.push('No verifying contract found in the signature data.');
+    }
+  } else return null;
+
+  return {
+    content: panel([
+      heading('Signature Insights'),
+      ...insights.map((insight) => text(insight)),
+    ]),
+    severity: SeverityLevel.Critical,
   };
 };
 
