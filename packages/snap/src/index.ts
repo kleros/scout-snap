@@ -117,7 +117,7 @@ const fetchGraphQLData = async (variables: {
 
   try {
     const response = await fetch(
-      'https://api.studio.thegraph.com/query/61738/legacy-curate-gnosis/version/latest',
+      'https://api.goldsky.com/api/public/project_cm5y7hx91t6zd01vzfnfchtf9/subgraphs/legacy-curate-gnosis/v1.1.4/gn',
       {
         method: 'POST',
         headers: {
