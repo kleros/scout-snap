@@ -95,7 +95,7 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.post(
-        'https://api.studio.thegraph.com/query/61738/legacy-curate-gnosis/version/latest',
+        "https://gateway.thegraph.com/api/b027176e14f0a073a572abe9068dd266/subgraphs/id/9hHo5MpjpC1JqfD3BsgFnojGurXRHTrHWcUcZPPCo6m8",
         {
           query: `
           {
