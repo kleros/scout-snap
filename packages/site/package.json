@@ -1,6 +1,6 @@
 {
   "name": "@kleros/scout-site",
-  "version": "1.3.1",
+  "version": "1.3.8",
   "private": true,
   "license": "(MIT-0 OR Apache-2.0)",
   "scripts": {
