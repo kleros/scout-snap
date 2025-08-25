@@ -121,15 +121,20 @@ const Index = () => {
 
   useEffect(() => {
     const filterPackages = async () => {
-      const results = await axios.get(
-        `https://registry.npmjs.org/-/v1/search?text=${search}`,
-      );
-      setFilteredPackages(
-        results.data.objects.map((obj: { package: any }) => obj.package),
-      );
+      try {
+        const results = await axios.get(
+          `https://registry.npmjs.org/-/v1/search?text=${encodeURIComponent(search)}`,
+        );
+        setFilteredPackages(
+          results.data.objects.map((obj: { package: any }) => obj.package),
+        );
+      } catch (error) {
+        console.error('Search API error:', error);
+        setFilteredPackages([]);
+      }
     };
 
-    if (search) {
+    if (search && search.length > 2) {
       filterPackages();
     } else {
       setFilteredPackages([]);
@@ -143,7 +148,7 @@ const Index = () => {
   };
 
   const handleConnectClick = async () => {
-    const defaultSnapOrigin = `npm:{selectedPackage}`;
+    const defaultSnapOrigin = `npm:${selectedPackage}`;
 
     try {
       await connectSnap(defaultSnapOrigin);

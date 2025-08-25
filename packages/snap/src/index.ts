@@ -32,6 +32,7 @@ type Token = {
   caipAddress: string;
   name: string;
   symbol: string;
+  website?: string;
 };
 
 type CuratedInfo = {
@@ -42,7 +43,10 @@ type CuratedInfo = {
 
 const parseMetadata = (metadata: any, keys: string[]) => {
   return keys.reduce((acc, key, index) => {
-    acc[key] = mdEscape(metadata[`key${index}`]);
+    const value = metadata[`key${index}`];
+    if (value !== undefined && value !== null && value !== '') {
+      acc[key] = mdEscape(value);
+    }
     return acc;
   }, {} as any);
 };
@@ -99,7 +103,7 @@ const fetchGraphQLData = async (variables: {
       }
     }
     tokens: litems(where:{
-      registry:"0x70533554fe5c17caf77fe530f77eab933b92af60",
+      registry:"0xee1502e29795ef6c2d60f8d7120596abe3bad990",
       metadata_: {
         key0_starts_with_nocase: $targetAddress,
         key0_ends_with_nocase: $targetAddress,
@@ -110,6 +114,7 @@ const fetchGraphQLData = async (variables: {
         key0
         key1
         key2
+        key3
       }
     }
   }
@@ -146,10 +151,14 @@ const fetchGraphQLData = async (variables: {
       : undefined;
 
     const parsedToken = result.data.tokens[0]
-      ? parseMetadata(result.data.tokens[0].metadata, ['caipAddress', 'name', 'symbol'])
+      ? parseMetadata(result.data.tokens[0].metadata, ['caipAddress', 'name', 'symbol', 'website'])
       : undefined;
 
-    return { addressTag: parsedAddressTag, contractDomain: parsedContractDomain, token: parsedToken };
+    return { 
+      addressTag: parsedAddressTag, 
+      contractDomain: parsedContractDomain, 
+      token: parsedToken,
+    };
   } catch (error) {
     console.error('GraphQL fetch error:', error);
     return null;
@@ -181,6 +190,7 @@ const getInsights = async (
   const insights: string[] = [];
 
   if (result.addressTag) {
+    insights.push(`✅ **Verified contract**`);
     // key2 is projectName, which is optional. No project name === "", which is falsy.
     const projectNameLabel = result.addressTag.projectName
       ? result.addressTag.infoLink
@@ -191,15 +201,20 @@ const getInsights = async (
     // Contract tag is a mandatory field.
     const contractTag = result.addressTag.publicName;
     insights.push(`**Project:** ${projectNameLabel}`);
-    insights.push(`**Contract Tag:** ${contractTag}`);
+    insights.push(`**Tag:** ${contractTag}`);
   }
 
   if (result.contractDomain) {
+    insights.push(`✅ **Verified domain**`);
     insights.push(`**Domain:** _${domain}_ is **verified** for this contract`);
   }
 
   if (result.token) {
-    insights.push(`**Token:** ${result.token.name} (${result.token.symbol})`);
+    insights.push(`✅ **Verified token**`);
+    const tokenName = result.token.website 
+      ? `[${result.token.name}](${result.token.website})`
+      : result.token.name;
+    insights.push(`**Token:** ${tokenName} (${result.token.symbol})`);
   }
 
   return insights;
@@ -265,7 +280,7 @@ export const onTransaction: OnTransactionHandler = async ({
       console.error('Invalid transaction origin:', error);
     }
   }
-  const numericChainId = parseInt(chainId.split(':')[1], 16);
+  const numericChainId = parseInt(chainId.split(':')[1], 10);
   const caipAddress = `eip155:${numericChainId}:${transaction.to as string}`;
 
   const result = await getInsights(caipAddress, domain);
@@ -281,18 +296,24 @@ export const onTransaction: OnTransactionHandler = async ({
     'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
     'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
     'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',
-    'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 'celoscan.io'
+    'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 
+    'celoscan.io', 'avascan.info', 'blastscan.io', 'mantlescan.xyz', 'sepolia.etherscan.io',
+    'goerli.etherscan.io', 'holesky.etherscan.io', 'testnet.bscscan.com', 'testnet.ftmscan.com',
+    'mumbai.polygonscan.com', 'goerli.arbiscan.io', 'sepolia.arbiscan.io', 'testnet.snowtrace.io',
+    'explorer.testnet.mantle.xyz', 'sepolia.basescan.org', 'goerli.basescan.org', 'alfajores.celoscan.io',
+    'blockscout.com', 'explorer.zksync.io', 'layerzeroscan.com', 'routescan.io',
+    'moonbeam.moonscan.io', 'subscan.io', 'solscan.io', 'explorer.near.org',
+    'cardanoscan.io', 'astar.subscan.io', 'polkadot.subscan.io', 'kusama.subscan.io'
   ];
 
   if (!excludedDomains.includes(domain) && !insights.some(insight => insight.includes('Domain'))) {
     const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
 
-    insights.push(`Is this contract linked to this domain? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`);
+    insights.push(`Is this contract officially linked to **${domain}**? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`);
   }
 
   return {
     content: panel([
-      heading('Contract insights'),
       ...insights.map((insight) => text(insight)),
     ]),
   };
