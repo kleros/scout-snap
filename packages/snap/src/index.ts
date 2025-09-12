@@ -292,7 +292,7 @@ export const onTransaction: OnTransactionHandler = async ({
   }
 
   const excludedDomains = [
-    'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
+    'NO_DOMAIN', 'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
     'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
     'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
     'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',

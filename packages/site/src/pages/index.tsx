@@ -164,6 +164,21 @@ const Index = () => {
     }
   };
 
+  const handleConnectLocalClick = async () => {
+    try {
+      await connectSnap('local:http://localhost:8081');
+      const installedSnap = await getSnaps();
+
+      dispatch({
+        type: MetamaskActions.SetInstalled,
+        payload: installedSnap,
+      });
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
+    }
+  };
+
   return (
     <Body>
       <Container>
@@ -183,6 +198,12 @@ const Index = () => {
             disabled={!selectedPackage}
           >
             Install {selectedPackage} Snap
+          </InstallButton>
+          <InstallButton
+            onClick={handleConnectLocalClick}
+            snapsNpmName="Localhost (8081)"
+          >
+            Install from Localhost
           </InstallButton>
         </SearchBarContainer>
         <Subtext>
