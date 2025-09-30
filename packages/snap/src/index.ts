@@ -8,7 +8,7 @@ import {
   divider,
   image,
   OnSignatureHandler,
-  SeverityLevel
+  SeverityLevel,
 } from '@metamask/snaps-sdk';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mdEscape from 'markdown-escape';
@@ -72,57 +72,38 @@ const fetchGraphQLData = async (variables: {
   // no other CAIP-10 legal string should match (since it would require having more than 2 ":" characters)
   // there is no "key0_nocase" query.
   const query = `
-  query($targetAddress: String!, $domain: String!) {
-    addressTags: litems(where:{
-      registry:"0x66260c69d03837016d88c9877e61e08ef74c59f2",
-      metadata_: {
-        key0_starts_with_nocase: $targetAddress,
-        key0_ends_with_nocase: $targetAddress,
-      },
-      status_in:[Registered, ClearingRequested]
-    }, first: 1) {
-      metadata {
-        key0
-        key1
-        key2
-        key3
-      }
+  query ($targetAddress: String!, $domain: String!) {
+    addressTags: LItem(
+      where: {registry_id: {_eq: "0x66260c69d03837016d88c9877e61e08ef74c59f2"}, key0: {_ilike: $targetAddress}, status: {_in: [Registered, ClearingRequested]}}
+      limit: 1
+    ) {
+      key0
+      key1
+      key2
+      key3
     }
-    contractDomains: litems(where:{
-      registry:"0x957a53a994860be4750810131d9c876b2f52d6e1",
-      metadata_: {
-        key0_starts_with_nocase: $targetAddress,
-        key0_ends_with_nocase: $targetAddress,
-        key1: $domain,
-      },
-      status_in:[Registered, ClearingRequested]
-    }, first: 1) {
-      metadata {
-        key0
-        key1
-      }
+    contractDomains: LItem(
+      where: {registry_id: {_eq: "0x957a53a994860be4750810131d9c876b2f52d6e1"}, key0: {_ilike: $targetAddress}, key1: {_eq: $domain}, status: {_in: [Registered, ClearingRequested]}}
+      limit: 1
+    ) {
+      key0
+      key1
     }
-    tokens: litems(where:{
-      registry:"0xee1502e29795ef6c2d60f8d7120596abe3bad990",
-      metadata_: {
-        key0_starts_with_nocase: $targetAddress,
-        key0_ends_with_nocase: $targetAddress,
-      },
-      status_in:[Registered, ClearingRequested]
-    }, first: 1) {
-      metadata {
-        key0
-        key1
-        key2
-        key3
-      }
+    tokens: LItem(
+      where: {registry_id: {_eq: "0xee1502e29795ef6c2d60f8d7120596abe3bad990"}, key0: {_ilike: $targetAddress}, status: {_in: [Registered, ClearingRequested]}}
+      limit: 1
+    ) {
+      key0
+      key1
+      key2
+      key3
     }
   }
   `;
 
   try {
     const response = await fetch(
-      "https://gateway.thegraph.com/api/b027176e14f0a073a572abe9068dd266/subgraphs/id/9hHo5MpjpC1JqfD3BsgFnojGurXRHTrHWcUcZPPCo6m8",
+      'https://indexer.hyperindex.xyz/1a2f51c/v1/graphql',
       {
         method: 'POST',
         headers: {
@@ -134,29 +115,39 @@ const fetchGraphQLData = async (variables: {
       },
     );
 
-  // Kleros Curate is a generalized registry, and is indexed by a generalized subgraph.
-  // Indexed fields are written into fields such as key0, key1...
-  // To make this code more readable, they are parsed onto the types at the beginning of this file.
+    // Kleros Curate is a generalized registry, and is indexed by a generalized subgraph.
+    // Indexed fields are written into fields such as key0, key1...
+    // To make this code more readable, they are parsed onto the types at the beginning of this file.
     if (!response.ok) return null;
 
     const result = await response.json();
     if (!result.data) return null;
 
     const parsedAddressTag = result.data.addressTags[0]
-      ? parseMetadata(result.data.addressTags[0].metadata, ['caipAddress', 'publicName', 'projectName', 'infoLink'])
+      ? parseMetadata(result.data.addressTags[0], [
+          'caipAddress',
+          'publicName',
+          'projectName',
+          'infoLink',
+        ])
       : undefined;
 
     const parsedContractDomain = result.data.contractDomains[0]
-      ? parseMetadata(result.data.contractDomains[0].metadata, ['caipAddress', 'domain'])
+      ? parseMetadata(result.data.contractDomains[0], ['caipAddress', 'domain'])
       : undefined;
 
     const parsedToken = result.data.tokens[0]
-      ? parseMetadata(result.data.tokens[0].metadata, ['caipAddress', 'name', 'symbol', 'website'])
+      ? parseMetadata(result.data.tokens[0], [
+          'caipAddress',
+          'name',
+          'symbol',
+          'website',
+        ])
       : undefined;
 
-    return { 
-      addressTag: parsedAddressTag, 
-      contractDomain: parsedContractDomain, 
+    return {
+      addressTag: parsedAddressTag,
+      contractDomain: parsedContractDomain,
       token: parsedToken,
     };
   } catch (error) {
@@ -211,7 +202,7 @@ const getInsights = async (
 
   if (result.token) {
     insights.push(`✅ **Verified token**`);
-    const tokenName = result.token.website 
+    const tokenName = result.token.website
       ? `[${result.token.name}](${result.token.website})`
       : result.token.name;
     insights.push(`**Token:** ${tokenName} (${result.token.symbol})`);
@@ -243,7 +234,9 @@ export const onInstall: OnInstallHandler = async () => {
         text(
           '**Contract Tag:** _What is the function or tag associated with the smart contract?_',
         ),
-        text('**Domain:** _Whether this contract is known to be used on this domain?_'),
+        text(
+          '**Domain:** _Whether this contract is known to be used on this domain?_',
+        ),
         image(InsightsDisplayImage),
       ]),
     },
@@ -288,38 +281,83 @@ export const onTransaction: OnTransactionHandler = async ({
   if (result.length > 0) {
     insights.push(...result);
   } else {
-    insights.push(`No insights available for this contract. Interact at your own risk.`);
+    insights.push(
+      `No insights available for this contract. Interact at your own risk.`,
+    );
   }
 
   const excludedDomains = [
-    'etherscan.io', 'bscscan.com', 'gnosisscan.io', 'polygonscan.com',
-    'mempool.space', 'explorer.solana.com', 'basescan.org', 'arbiscan.io',
-    'moonscan.io', 'lineascan.build', 'optimistic.etherscan.io', 'ftmscan.com',
-    'moonriver.moonscan.io', 'snowscan.xyz', 'cronoscan.com', 'bttcscan.com',
-    'zkevm.polygonscan.com', 'wemixscan.com', 'scrollscan.com', 'era.zksync.network', 
-    'celoscan.io', 'avascan.info', 'blastscan.io', 'mantlescan.xyz', 'sepolia.etherscan.io',
-    'goerli.etherscan.io', 'holesky.etherscan.io', 'testnet.bscscan.com', 'testnet.ftmscan.com',
-    'mumbai.polygonscan.com', 'goerli.arbiscan.io', 'sepolia.arbiscan.io', 'testnet.snowtrace.io',
-    'explorer.testnet.mantle.xyz', 'sepolia.basescan.org', 'goerli.basescan.org', 'alfajores.celoscan.io',
-    'blockscout.com', 'explorer.zksync.io', 'layerzeroscan.com', 'routescan.io',
-    'moonbeam.moonscan.io', 'subscan.io', 'solscan.io', 'explorer.near.org',
-    'cardanoscan.io', 'astar.subscan.io', 'polkadot.subscan.io', 'kusama.subscan.io'
+    'etherscan.io',
+    'bscscan.com',
+    'gnosisscan.io',
+    'polygonscan.com',
+    'mempool.space',
+    'explorer.solana.com',
+    'basescan.org',
+    'arbiscan.io',
+    'moonscan.io',
+    'lineascan.build',
+    'optimistic.etherscan.io',
+    'ftmscan.com',
+    'moonriver.moonscan.io',
+    'snowscan.xyz',
+    'cronoscan.com',
+    'bttcscan.com',
+    'zkevm.polygonscan.com',
+    'wemixscan.com',
+    'scrollscan.com',
+    'era.zksync.network',
+    'celoscan.io',
+    'avascan.info',
+    'blastscan.io',
+    'mantlescan.xyz',
+    'sepolia.etherscan.io',
+    'goerli.etherscan.io',
+    'holesky.etherscan.io',
+    'testnet.bscscan.com',
+    'testnet.ftmscan.com',
+    'mumbai.polygonscan.com',
+    'goerli.arbiscan.io',
+    'sepolia.arbiscan.io',
+    'testnet.snowtrace.io',
+    'explorer.testnet.mantle.xyz',
+    'sepolia.basescan.org',
+    'goerli.basescan.org',
+    'alfajores.celoscan.io',
+    'blockscout.com',
+    'explorer.zksync.io',
+    'layerzeroscan.com',
+    'routescan.io',
+    'moonbeam.moonscan.io',
+    'subscan.io',
+    'solscan.io',
+    'explorer.near.org',
+    'cardanoscan.io',
+    'astar.subscan.io',
+    'polkadot.subscan.io',
+    'kusama.subscan.io',
   ];
 
-  if (!excludedDomains.includes(domain) && !insights.some(insight => insight.includes('Domain'))) {
+  if (
+    !excludedDomains.includes(domain) &&
+    !insights.some((insight) => insight.includes('Domain'))
+  ) {
     const cdnPathURL = `https://app.klerosscout.eth.limo/#/?registry=CDN&network=1&network=100&network=137&network=56&network=42161&network=10&network=43114&network=534352&network=42220&network=8453&network=250&network=324&status=Registered&status=RegistrationRequested&status=ClearingRequested&status=Absent&disputed=true&disputed=false&page=1&orderDirection=desc&&additem=CDN&caip10Address=${caipAddress}&domain=${domain}`;
 
-    insights.push(`Is this contract officially linked to **${domain}**? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`);
+    insights.push(
+      `Is this contract officially linked to **${domain}**? If so, submit the info at [Scout App](${cdnPathURL}) to verify it for all users!`,
+    );
   }
 
   return {
-    content: panel([
-      ...insights.map((insight) => text(insight)),
-    ]),
+    content: panel([...insights.map((insight) => text(insight))]),
   };
 };
 
-export const onSignature: OnSignatureHandler = async ({ signature, signatureOrigin }) => {
+export const onSignature: OnSignatureHandler = async ({
+  signature,
+  signatureOrigin,
+}) => {
   const { signatureMethod, data } = signature;
   const insights: string[] = [];
 
@@ -329,15 +367,22 @@ export const onSignature: OnSignatureHandler = async ({ signature, signatureOrig
   ) {
     const verifyingContract = data?.domain?.verifyingContract;
     const numericChainId = data?.domain?.chainId;
-    const caipAddress = `eip155:${numericChainId}:${verifyingContract as string}`;
+    const caipAddress = `eip155:${numericChainId}:${
+      verifyingContract as string
+    }`;
 
     if (verifyingContract) {
-      const result = await getInsights(caipAddress, signatureOrigin || 'NO_DOMAIN');
+      const result = await getInsights(
+        caipAddress,
+        signatureOrigin || 'NO_DOMAIN',
+      );
 
       if (result.length > 0) {
         insights.push(...result);
       } else {
-        insights.push('No insights available for this contract. Interact at your own risk.');
+        insights.push(
+          'No insights available for this contract. Interact at your own risk.',
+        );
       }
     } else {
       insights.push('No verifying contract found in the signature data.');

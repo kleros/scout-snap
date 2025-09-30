@@ -95,20 +95,20 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.post(
-        "https://gateway.thegraph.com/api/b027176e14f0a073a572abe9068dd266/subgraphs/id/9hHo5MpjpC1JqfD3BsgFnojGurXRHTrHWcUcZPPCo6m8",
+        'https://indexer.hyperindex.xyz/1a2f51c/v1/graphql',
         {
           query: `
-          {
-            litems(first:1000, where:{registry:"0xfdb66ad9576842945431c27fe8cb5ef8ed5cb8bb", status_in:[Registered], disputed:false})
-          {
-              itemID
-              metadata {
-                key0
-                key1
-                key2
-              }
-            }
-          }
+       {
+        litems: LItem(
+          limit: 1000
+          where: {registry_id: {_eq: "0xfdb66ad9576842945431c27fe8cb5ef8ed5cb8bb"}, status: {_in: [Registered]}, disputed: {_eq: false}}
+        ) {
+          itemID
+          key0
+          key1
+          key2
+        }
+      }
         `,
         },
       );
@@ -123,7 +123,9 @@ const Index = () => {
     const filterPackages = async () => {
       try {
         const results = await axios.get(
-          `https://registry.npmjs.org/-/v1/search?text=${encodeURIComponent(search)}`,
+          `https://registry.npmjs.org/-/v1/search?text=${encodeURIComponent(
+            search,
+          )}`,
         );
         setFilteredPackages(
           results.data.objects.map((obj: { package: any }) => obj.package),
@@ -194,7 +196,7 @@ const Index = () => {
         </Subtext>
         <SearchResultList>
           {filteredPackages.map((pkg) => {
-            const isVerified = packages.some((item) => item?.metadata?.key0 === pkg.name);
+            const isVerified = packages.some((item) => item?.key0 === pkg.name);
             return (
               <SearchResultItem
                 key={pkg.name}
