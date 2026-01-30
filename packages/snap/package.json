@@ -1,6 +1,6 @@
 {
   "name": "@kleros/scout-snap",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A Metamask Snap that retrieves contract metadata from the Kleros Curate registries",
   "repository": {
     "type": "git",
@@ -65,7 +65,6 @@
     "yarn": "3.3.1"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "access": "public"
   }
 }
