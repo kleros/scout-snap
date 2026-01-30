@@ -10,6 +10,7 @@ This Snap pulls contract metadata from Kleros's decentralized token curated regi
 1. Tag this version: `version=v$(cat package.json | jq -r .version) && git tag -m $version $version`
 1. Push both commit and tag: `git push && git push --tags`
 1. Export your NPM token: `export YARN_NPM_AUTH_TOKEN=<npm_xxxxxxxxxxxx>`
+1. Login: `yarn npm login`
 1. Publish: `yarn publish`
 
 ## Notes
